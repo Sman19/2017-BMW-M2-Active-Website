@@ -921,16 +921,16 @@
             vehicles.push({
               exterior: cols[0] || "",
               interior: cols[2] || "",
-              year: cols[3] || "",
-              vin,
-              model: cols[5] || "",
+              year: cols[1] || "",
+              vin: cols[4] || "",
+              model: "F87",
               packages: cols[7] || "",
-              msrp: cols[9] || "",
+              msrp: cols[8] || "",
               dealer: cols[13] || "",
-              details: cols[17] || "",
-              vspec: cols[18] || "",
-              sticker: cols[19] || "",
-              invoice: cols[20] || "",
+              details: "",
+              vspec: "",
+              sticker: "",
+              invoice: "",
             });
           }
         }
