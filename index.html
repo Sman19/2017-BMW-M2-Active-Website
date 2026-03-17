@@ -890,6 +890,8 @@
 
         const vehicles = [];
 
+const vehicles = [];
+
 for (let i = 1; i < lines.length; i++) {
   if (!lines[i].trim()) continue;
 
@@ -918,8 +920,9 @@ for (let i = 1; i < lines.length; i++) {
   }
 }
 
-        document.getElementById("count").textContent = vehicles.length;
-        document.getElementById("total-count").textContent = vehicles.length;
+console.log("vehicles found:", vehicles.length);
+document.getElementById("count").textContent = vehicles.length;
+document.getElementById("total-count").textContent = vehicles.length;
 
         const table = document.getElementById("table-rows");
         table.innerHTML = "";
