@@ -1094,11 +1094,7 @@
       const vehicleName = document.getElementById("panel-vehicle-name");
       const vehicleInfoEl = document.getElementById("panel-vehicle-info");
 
-      let modelType = "E90";
-      if (vehicleInfo.model) {
-        if (vehicleInfo.model.startsWith("C5")) modelType = "E90";
-        else if (vehicleInfo.model.startsWith("C6")) modelType = "E92";
-        else if (vehicleInfo.model.startsWith("C7")) modelType = "E93";
+      vehicleName.textContent = `F87 M2`;
       }
 
       vehicleName.textContent = `${modelType} M2`;
