@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- ✅ HIDDEN TAB TITLE (no "2017 F87 M2 Coupe Database" in browser tab) -->
   <title>2017 F87 M2 Coupe Database</title>
 
-  <!-- ✅ ANIMATED FAVICON (keep as-is) -->
   <link
     id="favicon"
     rel="icon"
@@ -19,7 +17,6 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
 
-    /* ✅ Keep page background NORMAL (no rainbow) */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #ffffff;
@@ -29,7 +26,6 @@
 
     .app-shell { width: 100%; }
 
-    /* TOP NAV */
     .top-nav {
       height: 64px;
       background: #3b3f46;
@@ -64,7 +60,6 @@
     .user-icon { font-size: 18px; }
     .top-nav .divider { opacity: 0.7; }
 
-    /* OWNER ROW */
     .owner-row {
       display: flex;
       align-items: center;
@@ -89,7 +84,6 @@
     .owner-main { font-size: 22px; }
     .owner-sub { font-size: 22px; color: #e11d21; }
 
-    /* SUMMARY ROW */
     .summary-row {
       padding: 8px 32px 8px;
       border-bottom: 1px solid #e5e7eb;
@@ -112,11 +106,9 @@
       font-size: 14px;
     }
 
-    /* GRID WRAPPER */
     .grid-wrapper { width: 100%; overflow-x: auto; }
     .grid-inner { min-width: 1800px; }
 
-    /* COLUMN LABELS */
     .column-labels {
       display: flex;
       align-items: stretch;
@@ -161,7 +153,6 @@
     .cell-msrp { width: 120px; }
     .cell-dealer { width: 240px; }
 
-    /* Side Panel Styles */
     .side-panel {
       position: fixed;
       right: -400px;
@@ -248,7 +239,6 @@
     .side-panel-menu-icon { margin-bottom: 8px; font-size: 18px; }
     .side-panel-menu-text { font-size: 14px; font-weight: 500; text-align: center; }
 
-    /* Selection indicator */
     .selection-count {
       position: fixed;
       top: 72px;
@@ -265,16 +255,13 @@
 
     .selection-count.visible { display: block; }
 
-    /* Checkbox styling */
     .cell-checkbox input[type="checkbox"]:checked { accent-color: #2563eb; }
 
-    /* Selected row highlight */
     .table-row.selected {
       background: #dbeafe !important;
       border-left: 3px solid #2563eb;
     }
 
-    /* FILTER ROW */
     .table-header {
       display: flex;
       align-items: center;
@@ -296,7 +283,6 @@
       transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
-    /* ✅ ONLY the search inputs get the rainbow effect */
     .filter-input:focus {
       border-color: transparent;
       background: linear-gradient(
@@ -321,7 +307,6 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Status circle */
     .status-circle {
       width: 24px;
       height: 24px;
@@ -334,10 +319,8 @@
       font-weight: 600;
     }
 
-    /* Checkbox */
     .cell-checkbox input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
 
-    /* DATA ROWS */
     .table-row {
       display: flex;
       align-items: center;
@@ -359,7 +342,6 @@
       flex: 0 0 auto;
     }
 
-    /* Exterior image */
     .exterior-thumbnail {
       width: 90px;
       height: 60px;
@@ -368,10 +350,8 @@
       background: #f3f4f6;
     }
 
-    /* Model code */
     .model-code { font-weight: 600; color: #1e293b; font-size: 13px; }
 
-    /* Color display */
     .color-display { display: flex; align-items: center; gap: 8px; }
 
     .color-circle {
@@ -382,7 +362,6 @@
       flex-shrink: 0;
     }
 
-    /* Interior display */
     .interior-display { display: flex; align-items: center; gap: 8px; }
 
     .interior-square {
@@ -395,7 +374,6 @@
       flex-shrink: 0;
     }
 
-    /* VIN styling */
     .cell-vin {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       gap: 6px;
@@ -412,7 +390,6 @@
 
     .cell-msrp { font-weight: 600; color: #059669; }
 
-    /* Packages display (ellipsis version) */
     .packages-short {
       white-space: nowrap;
       overflow: hidden;
@@ -421,7 +398,6 @@
       display: block;
     }
 
-    /* Copy button */
     .copy-btn {
       border: 1px solid #d1d5db;
       background: #f9fafb;
@@ -439,7 +415,6 @@
       color: #fff;
     }
 
-    /* TOOLTIP */
     .tooltip { position: relative; }
     .tooltiptext { display: none; position: absolute; z-index: 20; }
     .tooltip:hover .tooltiptext { display: block; }
@@ -474,7 +449,6 @@
 
     .tooltip-packages div { margin: 4px 0; }
 
-    /* Loading */
     .loading { text-align: center; padding: 60px 20px; color: #64748b; }
 
     .loading-spinner {
@@ -493,7 +467,6 @@
 
 <body>
   <div class="app-shell">
-    <!-- TOP NAV BAR -->
     <header class="top-nav">
       <div class="top-nav-left">
         <span class="top-nav-home">Home</span>
@@ -509,7 +482,6 @@
       </div>
     </header>
 
-    <!-- OWNER / INVENTORY HEADER -->
     <div class="owner-row">
       <div class="owner-pill"></div>
       <div class="owner-labels">
@@ -518,7 +490,6 @@
       </div>
     </div>
 
-    <!-- SUMMARY ROW -->
     <div class="summary-row">
       <div class="summary-left">
         <input type="checkbox" class="summary-checkbox" />
@@ -529,10 +500,8 @@
       </div>
     </div>
 
-    <!-- GRID -->
     <div class="grid-wrapper">
       <div class="grid-inner">
-        <!-- COLUMN LABELS -->
         <div class="column-labels">
           <div class="header-cell header-checkbox"></div>
           <div class="header-cell header-status">Cat.</div>
@@ -547,7 +516,6 @@
           <div class="header-cell header-dealer">Dealer Name</div>
         </div>
 
-        <!-- FILTER INPUT ROW -->
         <div class="table-header">
           <div class="header-cell header-checkbox"></div>
           <div class="header-cell header-status"></div>
@@ -579,7 +547,6 @@
           </div>
         </div>
 
-        <!-- DATA ROWS INJECTED HERE -->
         <div id="table-rows">
           <div class="loading">
             <div class="loading-spinner"></div>
@@ -590,12 +557,10 @@
     </div>
   </div>
 
-  <!-- Selection Counter -->
   <div class="selection-count" id="selection-count">
     <span id="selection-count-text">0 Selected</span>
   </div>
 
-  <!-- Side Panel -->
   <div class="side-panel" id="side-panel">
     <div class="side-panel-header">
       <div class="side-panel-header-top">
@@ -631,12 +596,10 @@
   </div>
 
   <script>
-    // Reference data storage - will be populated from main.csv
     const colorLookup = {};
     const interiorLookup = {};
     const packageLookup = {};
 
-    // Hardcoded reference data as fallback
     const defaultColors = {
       "300": { rgb: "255, 255, 255", name: "Alpine White", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Alpine_White_380x260.png?raw=true" },
       "475": { rgb: "0, 0, 0", name: "Black Sapphire Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Black_Sapphire_380x260.png?raw=true" },
@@ -646,23 +609,18 @@
     };
 
     const defaultInteriors = {
-  "LCNL": {
-    image: "https://raw.githubusercontent.com/Sman19/F87-M2-Ext-Int/07ab816750f6763c0491ee47bf25568a7bb2a11f/m2%20interior%20Blue%20Stit.png",
-    description: "Black Dakota Leather w. Blue Stitch"
-  },
-  "Z1XX": {
-    image: "https://raw.githubusercontent.com/Sman19/F87-M2-Ext-Int/c3be7f7ddc554a924c667c73698c21a2c7a04a75/Austin%20yellow%20stitch.png",
-    description: "Black Dakota Leather w. Yellow Stitch"
-  }
-};
+      "LCNL": {
+        image: "https://raw.githubusercontent.com/Sman19/F87-M2-Ext-Int/07ab816750f6763c0491ee47bf25568a7bb2a11f/m2%20interior%20Blue%20Stit.png",
+        description: "Black Dakota Leather w. Blue Stitch"
+      },
+      "Z1XX": {
+        image: "https://raw.githubusercontent.com/Sman19/F87-M2-Ext-Int/c3be7f7ddc554a924c667c73698c21a2c7a04a75/Austin%20yellow%20stitch.png",
+        description: "Black Dakota Leather w. Yellow Stitch"
+      }
+    };
 
-    // ✅ Hardcoded fallback packages (so IND works even if your lookup section isn't detected)
     const defaultPackages = {
-      "IND": "BMW Individual (Paint) - $5,000.00",
-      // Add more if you want:
-      // "ZCP": "Competition Package",
-      // "ZCV": "Convenience Package",
-      // "ZCW": "Cold Weather Package",
+      "IND": "BMW Individual (Paint) - $5,000.00"
     };
 
     const fieldSelectors = {
@@ -768,41 +726,35 @@
     }
 
     function extractPaintCode(exteriorStr) {
-  if (!exteriorStr) return "";
-  const raw = exteriorStr.replace(/\s+/g, " ").trim().toUpperCase();
+      if (!exteriorStr) return "";
+      const raw = exteriorStr.replace(/\s+/g, " ").trim().toUpperCase();
 
-  const dashMatch = raw.match(/^([A-Z0-9]{3,4})\s*-\s*/);
-  if (dashMatch) return dashMatch[1];
+      const dashMatch = raw.match(/^([A-Z0-9]{3,4})\s*-\s*/);
+      if (dashMatch) return dashMatch[1];
 
-  const spaceMatch = raw.match(/^([A-Z0-9]{3,4})\s+/);
-  if (spaceMatch) return spaceMatch[1];
+      const spaceMatch = raw.match(/^([A-Z0-9]{3,4})\s+/);
+      if (spaceMatch) return spaceMatch[1];
 
-  return "";
-}
+      return "";
+    }
 
-      function extractInteriorCode(interiorStr) {
-    if (!interiorStr) return "";
+    function extractInteriorCode(interiorStr) {
+      if (!interiorStr) return "";
+      const raw = interiorStr.replace(/\s+/g, " ").trim();
+      const upper = raw.toUpperCase();
 
-    // normalize whitespace (tabs, extra spaces, CRLF)
-    const raw = interiorStr.replace(/\s+/g, " ").trim();
-    const upper = raw.toUpperCase();
+      if (/^[A-Z0-9]{3,6}$/.test(upper)) return upper;
 
-    // 1) If it's already just a code like "ZAP2"
-    if (/^[A-Z0-9]{3,6}$/.test(upper)) return upper;
+      const dashMatch = raw.match(/^([A-Z0-9]+)\s*-\s*/i);
+      if (dashMatch) return dashMatch[1].trim().toUpperCase();
 
-    // 2) If it starts with "CODE - description"
-    const dashMatch = raw.match(/^([A-Z0-9]+)\s*-\s*/i);
-    if (dashMatch) return dashMatch[1].trim().toUpperCase();
+      const spaceMatch = raw.match(/^([A-Z0-9]{3,6})\s+/i);
+      if (spaceMatch) return spaceMatch[1].trim().toUpperCase();
 
-    // 3) If it starts with "CODE description"
-    const spaceMatch = raw.match(/^([A-Z0-9]{3,6})\s+/i);
-    if (spaceMatch) return spaceMatch[1].trim().toUpperCase();
-
-    // 4) Keyword fallbacks
-    const low = raw.toLowerCase();
-    if (low.includes("fox red") && low.includes("extended")) return "NDH2";
-    if (low.includes("fox red")) return "NCH2";
-    if (low.includes("rust brown")) return "ZAP2";
+      const low = raw.toLowerCase();
+      if (low.includes("fox red") && low.includes("extended")) return "NDH2";
+      if (low.includes("fox red")) return "NCH2";
+      if (low.includes("rust brown")) return "ZAP2";
 
       return "";
     }
@@ -824,7 +776,6 @@
         for (let i = 0; i < lines.length; i++) {
           const cols = parseCSVLine(lines[i]);
 
-          // Section detection (kept compatible with your original logic)
           if (cols[2] && cols[3] && looksLikeSectionHeader(cols[2], "Paint Code") && looksLikeSectionHeader(cols[3], "Paint Name")) {
             currentSection = "exterior"; continue;
           }
@@ -837,7 +788,6 @@
 
           if (cols.every((c) => !c || !c.trim())) continue;
 
-          // Exterior reference rows
           if (currentSection === "exterior" && cols[2] && cols[2].trim()) {
             const paintCode = cols[2].trim().toUpperCase();
             if (paintCode && paintCode !== "PAINT CODE") {
@@ -849,7 +799,6 @@
             }
           }
 
-          // Interior reference rows
           if (currentSection === "interior" && cols[2] && cols[2].trim()) {
             const interiorCode = cols[2].trim().toUpperCase();
             if (interiorCode && interiorCode !== "INTERIOR CODE") {
@@ -860,7 +809,6 @@
             }
           }
 
-          // Package reference rows
           if (currentSection === "packages" && cols[2] && cols[2].trim()) {
             const packageCode = cols[2].trim().toUpperCase();
             if (packageCode && packageCode !== "PACKAGES" && cols[3]) {
@@ -875,11 +823,9 @@
         console.error("Error loading reference data from main.csv:", err);
       }
 
-      // Fallbacks
       if (Object.keys(colorLookup).length === 0) Object.assign(colorLookup, defaultColors);
       if (Object.keys(interiorLookup).length === 0) Object.assign(interiorLookup, defaultInteriors);
 
-      // ✅ Key fix for your issue: IND always resolves even if placed in the wrong CSV section
       Object.assign(packageLookup, defaultPackages, packageLookup);
     }
 
@@ -896,36 +842,36 @@
 
         const vehicles = [];
 
-for (let i = 1; i < lines.length; i++) {
-  if (!lines[i].trim()) continue;
+        for (let i = 1; i < lines.length; i++) {
+          if (!lines[i].trim()) continue;
 
-  const cols = parseCSVLine(lines[i]);
-  console.log("ROW", i, cols[0], cols[1], cols[2], cols[4], cols[13]);
+          const cols = parseCSVLine(lines[i]);
+          console.log("ROW", i, cols[0], cols[1], cols[2], cols[4], cols[13]);
 
-  const vin = cols[4] ? cols[4].trim() : "";
+          const vin = cols[4] ? cols[4].trim() : "";
 
-  if (vin && /^WBS/i.test(vin)) {
-    vehicles.push({
-      exterior: cols[0] || "",
-      interior: cols[2] || "",
-      year: cols[1] || "",
-      vin: cols[4] || "",
-      model: "F87",
-      packages: cols[7] || "",
-      msrp: cols[8] || "",
-      dealer: cols[13] || "",
-      details: "",
-      vspec: "",
-      sticker: "",
-      invoice: "",
-    });
+          if (vin && /^WBS/i.test(vin)) {
+            vehicles.push({
+              exterior: cols[0] || "",
+              interior: cols[2] || "",
+              year: cols[1] || "",
+              vin: cols[4] || "",
+              model: "F87",
+              packages: cols[7] || "",
+              transmission: cols[12] || "",
+              msrp: cols[8] || "",
+              dealer: cols[13] || "",
+              details: "",
+              vspec: "",
+              sticker: "",
+              invoice: "",
+            });
+          }
+        }
 
-  }
-}
-
-console.log("vehicles found:", vehicles.length);
-document.getElementById("count").textContent = vehicles.length;
-document.getElementById("total-count").textContent = vehicles.length;
+        console.log("vehicles found:", vehicles.length);
+        document.getElementById("count").textContent = vehicles.length;
+        document.getElementById("total-count").textContent = vehicles.length;
 
         const table = document.getElementById("table-rows");
         table.innerHTML = "";
@@ -943,15 +889,30 @@ document.getElementById("total-count").textContent = vehicles.length;
 
           const modelCode = "F87";
 
-          const packageCodes = vehicle.packages
-            ? vehicle.packages.split(/[,\s]+/).map((p) => p.trim()).filter((p) => p.length > 0)
-            : [];
+          const packageSet = new Set();
 
-          const packageDisplay = packageCodes.length > 0 ? packageCodes.join(", ") : "";
+          if (vehicle.packages) {
+            vehicle.packages
+              .split(/[,\s]+/)
+              .map((p) => p.trim())
+              .filter((p) => p.length > 0)
+              .forEach((p) => packageSet.add(p.toUpperCase()));
+          }
+
+          const transmissionValue = (vehicle.transmission || "").toString().trim().toUpperCase();
+          if (transmissionValue === "2MK") {
+            packageSet.add("2MK");
+          }
+
+          const packageCodes = Array.from(packageSet);
+          const packageDisplay = packageCodes.length > 0 ? packageCodes.join(", ") : "-";
 
           const packageDetails = packageCodes
             .map((code) => {
               const codeUpper = code.trim().toUpperCase();
+              if (codeUpper === "2MK") {
+                return `<div><strong>2MK:</strong> M Double-clutch Transmission</div>`;
+              }
               const pkg = packageLookup[codeUpper];
               return pkg
                 ? `<div><strong>${codeUpper}:</strong> ${pkg}</div>`
@@ -1079,21 +1040,20 @@ document.getElementById("total-count").textContent = vehicles.length;
     }
 
     function openSidePanel(vehicleInfo) {
-  const panel = document.getElementById("side-panel");
-  const vehicleName = document.getElementById("panel-vehicle-name");
-  const vehicleInfoEl = document.getElementById("panel-vehicle-info");
+      const panel = document.getElementById("side-panel");
+      const vehicleName = document.getElementById("panel-vehicle-name");
+      const vehicleInfoEl = document.getElementById("panel-vehicle-info");
 
-  vehicleName.textContent = "F87 M2";
-  vehicleInfoEl.textContent = vehicleInfo.vin || "Unknown VIN";
+      vehicleName.textContent = "F87 M2";
+      vehicleInfoEl.textContent = vehicleInfo.vin || "Unknown VIN";
 
-  panel.dataset.currentVin = vehicleInfo.vin || "";
-  panel.dataset.currentDetails = vehicleInfo.details || "";
-  panel.dataset.currentVspec = vehicleInfo.vspec || "";
-  panel.dataset.currentSticker = vehicleInfo.sticker || "";
-  panel.dataset.currentInvoice = vehicleInfo.invoice || "";
+      panel.dataset.currentVin = vehicleInfo.vin || "";
+      panel.dataset.currentDetails = vehicleInfo.details || "";
+      panel.dataset.currentVspec = vehicleInfo.vspec || "";
+      panel.dataset.currentSticker = vehicleInfo.sticker || "";
+      panel.dataset.currentInvoice = vehicleInfo.invoice || "";
 
-  panel.classList.add("open");
-
+      panel.classList.add("open");
     }
 
     function closeSidePanel() {
@@ -1170,16 +1130,13 @@ document.getElementById("total-count").textContent = vehicles.length;
         setInterval(() => {
           ctx.clearRect(0, 0, size, size);
 
-          // Black circular background
           ctx.beginPath();
           ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
           ctx.fillStyle = "#000000";
           ctx.fill();
 
-          // Draw logo
           ctx.drawImage(img, 0, 0, size, size);
 
-          // Rotating neon ring
           ctx.save();
           ctx.translate(size / 2, size / 2);
           ctx.rotate(angle);
