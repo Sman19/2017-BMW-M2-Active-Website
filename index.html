@@ -644,33 +644,62 @@
       };
     }
 
-    function applyFilters() {
-      const rows = document.querySelectorAll("#table-rows .table-row");
-      const inputs = document.querySelectorAll(".filter-input");
+   function applyFilters() {
+  const rows = document.querySelectorAll("#table-rows .table-row");
+  const inputs = document.querySelectorAll(".filter-input");
 
-      const filters = {};
-      inputs.forEach((input) => {
-        const field = input.dataset.field;
-        const value = normalize(input.value);
-        if (value) filters[field] = value;
-      });
+  const filters = {};
+  inputs.forEach((input) => {
+    const field = input.dataset.field;
+    const value = (input.value || "").trim();
+    if (value) filters[field] = value;
+  });
 
-      let visibleCount = 0;
-      rows.forEach((row) => {
-        let visible = true;
-        for (const field in filters) {
-          const selector = fieldSelectors[field];
-          if (!selector) continue;
-          const cell = row.querySelector(selector);
-          const cellText = normalize(cell ? cell.innerText : "");
-          if (!cellText.includes(filters[field])) { visible = false; break; }
+  let visibleCount = 0;
+
+  rows.forEach((row) => {
+    let visible = true;
+
+    for (const field in filters) {
+      const selector = fieldSelectors[field];
+      if (!selector) continue;
+
+      const cell = row.querySelector(selector);
+      const cellText = normalize(cell ? cell.innerText : "");
+      const rawFilter = filters[field];
+
+      // split by comma so you can support multiple terms if needed
+      const parts = rawFilter
+        .split(",")
+        .map((p) => p.trim())
+        .filter(Boolean);
+
+      for (const part of parts) {
+        // support "-2MK" or "- 2MK"
+        if (/^-\s*/.test(part)) {
+          const excludeTerm = normalize(part.replace(/^-\s*/, ""));
+          if (excludeTerm && cellText.includes(excludeTerm)) {
+            visible = false;
+            break;
+          }
+        } else {
+          const includeTerm = normalize(part);
+          if (includeTerm && !cellText.includes(includeTerm)) {
+            visible = false;
+            break;
+          }
         }
-        row.style.display = visible ? "flex" : "none";
-        if (visible) visibleCount++;
-      });
+      }
 
-      document.getElementById("count").textContent = visibleCount;
+      if (!visible) break;
     }
+
+    row.style.display = visible ? "flex" : "none";
+    if (visible) visibleCount++;
+  });
+
+  document.getElementById("count").textContent = visibleCount;
+}
 
     function setupFilterInputs() {
       const debouncedFilter = debounce(applyFilters, 300);
