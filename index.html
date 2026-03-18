@@ -851,14 +851,22 @@
           const vin = cols[4] ? cols[4].trim() : "";
 
           if (vin && /^WBS/i.test(vin)) {
+            const basePackages = (cols[7] || "").trim();     // column H
+            const transmission2MK = (cols[12] || "").trim(); // change 12 if needed
+            
+            const combinedPackages = [basePackages];
+            
+            if (transmission2MK.toUpperCase() === "2MK") {
+              combinedPackages.push("2MK");
+            }
+            
             vehicles.push({
               exterior: cols[0] || "",
               interior: cols[2] || "",
               year: cols[1] || "",
               vin: cols[4] || "",
               model: "F87",
-              packages: cols[7] || "",
-              transmission: cols[12] || "",
+              packages: combinedPackages.filter(Boolean).join(", "),
               msrp: cols[8] || "",
               dealer: cols[13] || "",
               details: "",
