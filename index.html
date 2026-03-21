@@ -461,11 +461,50 @@
       margin: 0 auto 20px;
     }
 
+    .csv-switcher {
+      position: fixed;
+      left: 16px;
+      top: 90px;
+      z-index: 1200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .csv-switch-btn {
+      background: #ffffff;
+      color: #111827;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: left;
+      min-width: 140px;
+    }
+
+    .csv-switch-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .csv-switch-btn.active {
+      background: #dc2626;
+      color: #ffffff;
+      border-color: #dc2626;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body>
+  <div class="csv-switcher">
+    <button class="csv-switch-btn" id="btn-main" onclick="switchCsv('main.csv')">Main CSV</button>
+    <button class="csv-switch-btn" id="btn-2016" onclick="switchCsv('2016 F87 M2.csv')">2016 CSV</button>
+  </div>
+
   <div class="app-shell">
     <header class="top-nav">
       <div class="top-nav-left">
@@ -599,6 +638,7 @@
     const colorLookup = {};
     const interiorLookup = {};
     const packageLookup = {};
+    let currentCsvFile = "main.csv";
 
     const defaultColors = {
       "300": { rgb: "255, 255, 255", name: "Alpine White", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Alpine_White_380x260.png?raw=true" },
@@ -644,62 +684,85 @@
       };
     }
 
-   function applyFilters() {
-  const rows = document.querySelectorAll("#table-rows .table-row");
-  const inputs = document.querySelectorAll(".filter-input");
-
-  const filters = {};
-  inputs.forEach((input) => {
-    const field = input.dataset.field;
-    const value = (input.value || "").trim();
-    if (value) filters[field] = value;
-  });
-
-  let visibleCount = 0;
-
-  rows.forEach((row) => {
-    let visible = true;
-
-    for (const field in filters) {
-      const selector = fieldSelectors[field];
-      if (!selector) continue;
-
-      const cell = row.querySelector(selector);
-      const cellText = normalize(cell ? cell.innerText : "");
-      const rawFilter = filters[field];
-
-      // split by comma so you can support multiple terms if needed
-      const parts = rawFilter
-        .split(",")
-        .map((p) => p.trim())
-        .filter(Boolean);
-
-      for (const part of parts) {
-        // support "-2MK" or "- 2MK"
-        if (/^-\s*/.test(part)) {
-          const excludeTerm = normalize(part.replace(/^-\s*/, ""));
-          if (excludeTerm && cellText.includes(excludeTerm)) {
-            visible = false;
-            break;
-          }
-        } else {
-          const includeTerm = normalize(part);
-          if (includeTerm && !cellText.includes(includeTerm)) {
-            visible = false;
-            break;
-          }
-        }
-      }
-
-      if (!visible) break;
+    function getCsvFileFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("file") || "main.csv";
     }
 
-    row.style.display = visible ? "flex" : "none";
-    if (visible) visibleCount++;
-  });
+    function setActiveCsvButton() {
+      const btnMain = document.getElementById("btn-main");
+      const btn2016 = document.getElementById("btn-2016");
 
-  document.getElementById("count").textContent = visibleCount;
-}
+      if (btnMain) btnMain.classList.remove("active");
+      if (btn2016) btn2016.classList.remove("active");
+
+      if (currentCsvFile === "2016 F87 M2.csv") {
+        if (btn2016) btn2016.classList.add("active");
+      } else {
+        if (btnMain) btnMain.classList.add("active");
+      }
+    }
+
+    function switchCsv(fileName) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("file", fileName);
+      window.location.href = url.toString();
+    }
+
+    function applyFilters() {
+      const rows = document.querySelectorAll("#table-rows .table-row");
+      const inputs = document.querySelectorAll(".filter-input");
+
+      const filters = {};
+      inputs.forEach((input) => {
+        const field = input.dataset.field;
+        const value = (input.value || "").trim();
+        if (value) filters[field] = value;
+      });
+
+      let visibleCount = 0;
+
+      rows.forEach((row) => {
+        let visible = true;
+
+        for (const field in filters) {
+          const selector = fieldSelectors[field];
+          if (!selector) continue;
+
+          const cell = row.querySelector(selector);
+          const cellText = normalize(cell ? cell.innerText : "");
+          const rawFilter = filters[field];
+
+          const parts = rawFilter
+            .split(",")
+            .map((p) => p.trim())
+            .filter(Boolean);
+
+          for (const part of parts) {
+            if (/^-\s*/.test(part)) {
+              const excludeTerm = normalize(part.replace(/^-\s*/, ""));
+              if (excludeTerm && cellText.includes(excludeTerm)) {
+                visible = false;
+                break;
+              }
+            } else {
+              const includeTerm = normalize(part);
+              if (includeTerm && !cellText.includes(includeTerm)) {
+                visible = false;
+                break;
+              }
+            }
+          }
+
+          if (!visible) break;
+        }
+
+        row.style.display = visible ? "flex" : "none";
+        if (visible) visibleCount++;
+      });
+
+      document.getElementById("count").textContent = visibleCount;
+    }
 
     function setupFilterInputs() {
       const debouncedFilter = debounce(applyFilters, 300);
@@ -793,8 +856,12 @@
     }
 
     async function loadReferenceData() {
+      Object.keys(colorLookup).forEach(k => delete colorLookup[k]);
+      Object.keys(interiorLookup).forEach(k => delete interiorLookup[k]);
+      Object.keys(packageLookup).forEach(k => delete packageLookup[k]);
+
       try {
-        const response = await fetch("main.csv");
+        const response = await fetch(currentCsvFile);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const csvText = await response.text();
@@ -849,7 +916,7 @@
           }
         }
       } catch (err) {
-        console.error("Error loading reference data from main.csv:", err);
+        console.error(`Error loading reference data from ${currentCsvFile}:`, err);
       }
 
       if (Object.keys(colorLookup).length === 0) Object.assign(colorLookup, defaultColors);
@@ -859,10 +926,12 @@
     }
 
     async function loadCSV() {
+      currentCsvFile = getCsvFileFromUrl();
+      setActiveCsvButton();
       await loadReferenceData();
 
       try {
-        const response = await fetch("main.csv");
+        const response = await fetch(currentCsvFile);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const csvText = await response.text();
@@ -880,15 +949,15 @@
           const vin = cols[4] ? cols[4].trim() : "";
 
           if (vin && /^WBS/i.test(vin)) {
-            const basePackages = (cols[7] || "").trim();     // column H
-            const transmission2MK = (cols[12] || "").trim(); // change 12 if needed
-            
+            const basePackages = (cols[7] || "").trim();
+            const transmission2MK = (cols[12] || "").trim();
+
             const combinedPackages = [basePackages];
-            
+
             if (transmission2MK.toUpperCase() === "2MK") {
               combinedPackages.push("2MK");
             }
-            
+
             vehicles.push({
               exterior: cols[0] || "",
               interior: cols[2] || "",
@@ -926,7 +995,7 @@
 
           const modelCode = "F87";
 
-         const packageSet = new Set();
+          const packageSet = new Set();
 
           if (vehicle.packages) {
             vehicle.packages
@@ -935,7 +1004,7 @@
               .filter((p) => p.length > 0)
               .forEach((p) => packageSet.add(p.toUpperCase()));
           }
-          
+
           const packageCodes = Array.from(packageSet);
           const packageDisplay = packageCodes.length > 0 ? packageCodes.join(", ") : "-";
 
@@ -1034,7 +1103,7 @@
           <div style="padding: 40px; text-align: center; color: #dc3545;">
             <h3>⚠️ Error Loading Data</h3>
             <p>${err.message}</p>
-            <p>Please ensure main.csv is in the same directory as this HTML file.</p>
+            <p>Please ensure the selected CSV file is in the same directory as this HTML file.</p>
           </div>
         `;
       }
