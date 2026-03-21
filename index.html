@@ -242,6 +242,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      flex-wrap: wrap;
     }
 
     .summary-checkbox { width: 16px; height: 16px; }
@@ -253,6 +254,54 @@
       padding: 2px 10px;
       border-radius: 4px;
       font-size: 14px;
+    }
+
+    .active-filters-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-left: 4px;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #111827;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .filter-chip-remove {
+      cursor: pointer;
+      font-weight: 700;
+      opacity: 0.9;
+    }
+
+    .filter-chip-remove:hover {
+      opacity: 1;
+    }
+
+    .clear-filters-btn {
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      color: #111827;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .clear-filters-btn:hover {
+      background: #f3f4f6;
     }
 
     .grid-wrapper { width: 100%; overflow-x: auto; }
@@ -1374,30 +1423,29 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-  updateAuthUser();
-  setupFilterInputs();
+      updateAuthUser();
+      setupFilterInputs();
 
-  let attempts = 0;
-  const maxAttempts = 10;
+      let attempts = 0;
+      const maxAttempts = 10;
 
-  const waitForAuthThenLoad = () => {
-    attempts++;
+      const waitForAuthThenLoad = () => {
+        attempts++;
 
-    if (typeof login !== "undefined") {
-      loadCSV();
-      return;
-    }
+        if (typeof login !== "undefined") {
+          loadCSV();
+          return;
+        }
 
-    if (attempts < maxAttempts) {
-      setTimeout(waitForAuthThenLoad, 300);
-    } else {
-      loadCSV();
-    }
-  };
+        if (attempts < maxAttempts) {
+          setTimeout(waitForAuthThenLoad, 300);
+        } else {
+          loadCSV();
+        }
+      };
 
-  waitForAuthThenLoad();
-});
-    
+      waitForAuthThenLoad();
+    });
   </script>
 
   <script>
