@@ -1374,10 +1374,27 @@
   updateAuthUser();
   setupFilterInputs();
 
-  setTimeout(() => {
-    loadCSV();
-  }, 800);
-    });
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  const waitForAuthThenLoad = () => {
+    attempts++;
+
+    if (typeof login !== "undefined") {
+      loadCSV();
+      return;
+    }
+
+    if (attempts < maxAttempts) {
+      setTimeout(waitForAuthThenLoad, 300);
+    } else {
+      loadCSV();
+    }
+  };
+
+  waitForAuthThenLoad();
+});
+    
   </script>
 
   <script>
