@@ -782,6 +782,22 @@
       url.searchParams.set("file", fileName);
       window.location.href = url.toString();
     }
+        function toggleSidebar() {
+      const sidebar = document.getElementById("left-sidebar");
+      const toggle = document.getElementById("sidebar-toggle");
+    
+      if (!sidebar || !toggle) return;
+    
+      sidebar.classList.toggle("collapsed");
+    
+      if (sidebar.classList.contains("collapsed")) {
+        toggle.textContent = "▶";
+        toggle.title = "Show filters";
+      } else {
+        toggle.textContent = "◀";
+        toggle.title = "Hide filters";
+      }
+    }
 
     function applyFilters() {
       const rows = document.querySelectorAll("#table-rows .table-row");
