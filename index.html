@@ -1029,6 +1029,24 @@
   document.getElementById("count").textContent = visibleCount;
 }
 
+function clearAllFilters() {
+  document.querySelectorAll(".filter-input").forEach((input) => {
+    input.value = "";
+  });
+  applyFilters();
+}
+
+document.addEventListener("click", function (e) {
+  if (e.target.matches(".filter-chip-remove")) {
+    const field = e.target.dataset.field;
+    const input = document.querySelector(`.filter-input[data-field="${field}"]`);
+    if (input) {
+      input.value = "";
+      applyFilters();
+    }
+  }
+});    
+
     function setupFilterInputs() {
       const debouncedFilter = debounce(applyFilters, 300);
       document.querySelectorAll(".filter-input").forEach((input) => {
