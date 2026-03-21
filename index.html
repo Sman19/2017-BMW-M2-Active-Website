@@ -1371,9 +1371,12 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      updateAuthUser();
-      setupFilterInputs();
-      loadCSV();
+  updateAuthUser();
+  setupFilterInputs();
+
+  setTimeout(() => {
+    loadCSV();
+  }, 800);
     });
   </script>
 
