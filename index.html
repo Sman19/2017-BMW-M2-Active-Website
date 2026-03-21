@@ -84,6 +84,62 @@
     .owner-main { font-size: 22px; }
     .owner-sub { font-size: 22px; color: #e11d21; }
 
+    .page-layout {
+      display: flex;
+      width: 100%;
+      min-height: calc(100vh - 64px);
+    }
+
+    .left-sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #f3f4f6;
+      border-right: 1px solid #d1d5db;
+      padding: 18px 14px;
+    }
+
+    .sidebar-section {
+      margin-bottom: 18px;
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .sidebar-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #4b5563;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+
+    .sidebar-select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #111827;
+      font-size: 14px;
+      padding: 0 10px;
+      outline: none;
+    }
+
+    .sidebar-select:focus {
+      border-color: #2563eb;
+    }
+
+    .main-content {
+      flex: 1;
+      min-width: 0;
+    }
+
     .summary-row {
       padding: 8px 32px 8px;
       border-bottom: 1px solid #e5e7eb;
@@ -461,73 +517,11 @@
       margin: 0 auto 20px;
     }
 
-    .page-layout {
-  display: flex;
-  width: 100%;
-  min-height: calc(100vh - 64px);
-}
-
-.left-sidebar {
-  width: 240px;
-  min-width: 240px;
-  background: #f3f4f6;
-  border-right: 1px solid #d1d5db;
-  padding: 18px 14px;
-}
-
-.sidebar-section {
-  margin-bottom: 18px;
-}
-
-.sidebar-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #374151;
-  margin-bottom: 16px;
-}
-
-.sidebar-label {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-  color: #4b5563;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-}
-
-.sidebar-select {
-  width: 100%;
-  height: 38px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #111827;
-  font-size: 14px;
-  padding: 0 10px;
-  outline: none;
-}
-
-.sidebar-select:focus {
-  border-color: #2563eb;
-}
-
-.main-content {
-  flex: 1;
-  min-width: 0;
-}
-    }
-
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body>
-  <div class="csv-switcher">
-    <button class="csv-switch-btn" id="btn-main" onclick="switchCsv('main.csv')">Main CSV</button>
-    <button class="csv-switch-btn" id="btn-2016" onclick="switchCsv('2016 F87 M2.csv')">2016 CSV</button>
-  </div>
-
   <div class="app-shell">
     <header class="top-nav">
       <div class="top-nav-left">
@@ -552,67 +546,83 @@
       </div>
     </div>
 
-    <div class="summary-row">
-      <div class="summary-left">
-        <input type="checkbox" class="summary-checkbox" />
-        <span class="summary-text">
-          <span id="count">0</span> of <span id="total-count">0</span> Vehicle(s)
-        </span>
-        <span class="badge-m2">M2</span>
-      </div>
-    </div>
+    <div class="page-layout">
+      <aside class="left-sidebar">
+        <div class="sidebar-title">Filter Inventory</div>
 
-    <div class="grid-wrapper">
-      <div class="grid-inner">
-        <div class="column-labels">
-          <div class="header-cell header-checkbox"></div>
-          <div class="header-cell header-status">Cat.</div>
-          <div class="header-cell header-image">Image</div>
-          <div class="header-cell header-model">Model</div>
-          <div class="header-cell header-exterior">Exterior</div>
-          <div class="header-cell header-interior">Interior</div>
-          <div class="header-cell header-year">Year</div>
-          <div class="header-cell header-vin">VIN</div>
-          <div class="header-cell header-packages">Packages(Destination Charge: $995)</div>
-          <div class="header-cell header-msrp">MSRP</div>
-          <div class="header-cell header-dealer">Dealer Name</div>
+        <div class="sidebar-section">
+          <label class="sidebar-label" for="dataset-select">Dataset</label>
+          <select id="dataset-select" class="sidebar-select" onchange="handleDatasetChange(this.value)">
+            <option value="main.csv">Main CSV</option>
+            <option value="2016 F87 M2.csv">2016 CSV</option>
+          </select>
         </div>
+      </aside>
 
-        <div class="table-header">
-          <div class="header-cell header-checkbox"></div>
-          <div class="header-cell header-status"></div>
-          <div class="header-cell header-image"></div>
-
-          <div class="header-cell header-model">
-            <input class="filter-input" data-field="model" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-exterior">
-            <input class="filter-input" data-field="exterior" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-interior">
-            <input class="filter-input" data-field="interior" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-year">
-            <input class="filter-input" data-field="year" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-vin">
-            <input class="filter-input" data-field="vin" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-packages">
-            <input class="filter-input" data-field="packages" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-msrp">
-            <input class="filter-input" data-field="msrp" placeholder="Filter..." />
-          </div>
-          <div class="header-cell header-dealer">
-            <input class="filter-input" data-field="dealer" placeholder="Filter..." />
+      <div class="main-content">
+        <div class="summary-row">
+          <div class="summary-left">
+            <input type="checkbox" class="summary-checkbox" />
+            <span class="summary-text">
+              <span id="count">0</span> of <span id="total-count">0</span> Vehicle(s)
+            </span>
+            <span class="badge-m2">M2</span>
           </div>
         </div>
 
-        <div id="table-rows">
-          <div class="loading">
-            <div class="loading-spinner"></div>
-            <div>Loading vehicle data...</div>
+        <div class="grid-wrapper">
+          <div class="grid-inner">
+            <div class="column-labels">
+              <div class="header-cell header-checkbox"></div>
+              <div class="header-cell header-status">Cat.</div>
+              <div class="header-cell header-image">Image</div>
+              <div class="header-cell header-model">Model</div>
+              <div class="header-cell header-exterior">Exterior</div>
+              <div class="header-cell header-interior">Interior</div>
+              <div class="header-cell header-year">Year</div>
+              <div class="header-cell header-vin">VIN</div>
+              <div class="header-cell header-packages">Packages(Destination Charge: $995)</div>
+              <div class="header-cell header-msrp">MSRP</div>
+              <div class="header-cell header-dealer">Dealer Name</div>
+            </div>
+
+            <div class="table-header">
+              <div class="header-cell header-checkbox"></div>
+              <div class="header-cell header-status"></div>
+              <div class="header-cell header-image"></div>
+
+              <div class="header-cell header-model">
+                <input class="filter-input" data-field="model" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-exterior">
+                <input class="filter-input" data-field="exterior" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-interior">
+                <input class="filter-input" data-field="interior" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-year">
+                <input class="filter-input" data-field="year" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-vin">
+                <input class="filter-input" data-field="vin" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-packages">
+                <input class="filter-input" data-field="packages" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-msrp">
+                <input class="filter-input" data-field="msrp" placeholder="Filter..." />
+              </div>
+              <div class="header-cell header-dealer">
+                <input class="filter-input" data-field="dealer" placeholder="Filter..." />
+              </div>
+            </div>
+
+            <div id="table-rows">
+              <div class="loading">
+                <div class="loading-spinner"></div>
+                <div>Loading vehicle data...</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -697,7 +707,9 @@
       dealer: ".cell-dealer",
     };
 
-    function normalize(text) { return (text || "").toLowerCase().trim(); }
+    function normalize(text) {
+      return (text || "").toLowerCase().trim();
+    }
 
     function debounce(func, wait) {
       let timeout;
@@ -712,21 +724,14 @@
       return params.get("file") || "main.csv";
     }
 
-    function setActiveCsvButton() {
-      const btnMain = document.getElementById("btn-main");
-      const btn2016 = document.getElementById("btn-2016");
-
-      if (btnMain) btnMain.classList.remove("active");
-      if (btn2016) btn2016.classList.remove("active");
-
-      if (currentCsvFile === "2016 F87 M2.csv") {
-        if (btn2016) btn2016.classList.add("active");
-      } else {
-        if (btnMain) btnMain.classList.add("active");
+    function syncDatasetDropdown() {
+      const select = document.getElementById("dataset-select");
+      if (select) {
+        select.value = currentCsvFile;
       }
     }
 
-    function switchCsv(fileName) {
+    function handleDatasetChange(fileName) {
       const url = new URL(window.location.href);
       url.searchParams.set("file", fileName);
       window.location.href = url.toString();
@@ -826,8 +831,12 @@
         const nextChar = line[i + 1];
 
         if (char === '"') {
-          if (inQuotes && nextChar === '"') { current += '"'; i++; }
-          else { inQuotes = !inQuotes; }
+          if (inQuotes && nextChar === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
         } else if (char === "," && !inQuotes) {
           result.push(current.trim());
           current = "";
@@ -896,13 +905,16 @@
           const cols = parseCSVLine(lines[i]);
 
           if (cols[2] && cols[3] && looksLikeSectionHeader(cols[2], "Paint Code") && looksLikeSectionHeader(cols[3], "Paint Name")) {
-            currentSection = "exterior"; continue;
+            currentSection = "exterior";
+            continue;
           }
           if (cols[2] && looksLikeSectionHeader(cols[2], "INTERIOR Code")) {
-            currentSection = "interior"; continue;
+            currentSection = "interior";
+            continue;
           }
           if (cols[2] && (looksLikeSectionHeader(cols[2], "Packages") || looksLikeSectionHeader(cols[2], "PACKAGES"))) {
-            currentSection = "packages"; continue;
+            currentSection = "packages";
+            continue;
           }
 
           if (cols.every((c) => !c || !c.trim())) continue;
@@ -944,13 +956,12 @@
 
       if (Object.keys(colorLookup).length === 0) Object.assign(colorLookup, defaultColors);
       if (Object.keys(interiorLookup).length === 0) Object.assign(interiorLookup, defaultInteriors);
-
       Object.assign(packageLookup, defaultPackages, packageLookup);
     }
 
     async function loadCSV() {
       currentCsvFile = getCsvFileFromUrl();
-      setActiveCsvButton();
+      syncDatasetDropdown();
       await loadReferenceData();
 
       try {
@@ -967,8 +978,6 @@
           if (!lines[i].trim()) continue;
 
           const cols = parseCSVLine(lines[i]);
-          console.log("ROW", i, cols[0], cols[1], cols[2], cols[4], cols[13]);
-
           const vin = cols[4] ? cols[4].trim() : "";
 
           if (vin && /^WBS/i.test(vin)) {
@@ -976,7 +985,6 @@
             const transmission2MK = (cols[12] || "").trim();
 
             const combinedPackages = [basePackages];
-
             if (transmission2MK.toUpperCase() === "2MK") {
               combinedPackages.push("2MK");
             }
@@ -998,7 +1006,6 @@
           }
         }
 
-        console.log("vehicles found:", vehicles.length);
         document.getElementById("count").textContent = vehicles.length;
         document.getElementById("total-count").textContent = vehicles.length;
 
@@ -1015,7 +1022,6 @@
           const colorData = colorLookup[paintCode] || { rgb: "128,128,128", name: "Unknown" };
           const interiorData = interiorLookup[interiorCode] || { image: "", description: "Unknown" };
           const exteriorImage = colorData.image || "";
-
           const modelCode = "F87";
 
           const packageSet = new Set();
@@ -1046,15 +1052,11 @@
 
           row.innerHTML = `
             <div class="cell cell-checkbox"><input type="checkbox"></div>
-
             <div class="cell cell-status"><div class="status-circle">G</div></div>
-
             <div class="cell cell-image">
               ${exteriorImage ? `<img src="${exteriorImage}" class="exterior-thumbnail" alt="${vehicle.exterior}">` : `<div class="exterior-thumbnail"></div>`}
             </div>
-
             <div class="cell cell-model"><span class="model-code">${modelCode}</span></div>
-
             <div class="cell cell-exterior">
               <div class="tooltip">
                 <div class="color-display">
@@ -1064,7 +1066,6 @@
                 <div class="tooltiptext tooltip-red-content">${vehicle.exterior}<br>RGB: ${colorData.rgb}</div>
               </div>
             </div>
-
             <div class="cell cell-interior">
               <div class="tooltip">
                 <div class="interior-display">
@@ -1078,9 +1079,7 @@
                 <div class="tooltiptext tooltip-red-content">${vehicle.interior}</div>
               </div>
             </div>
-
             <div class="cell cell-year">${vehicle.year}</div>
-
             <div class="cell cell-vin">
               <div class="tooltip">
                 <span class="vin-text" id="vin-${index}">${vehicle.vin}</span>
@@ -1088,7 +1087,6 @@
               </div>
               <button class="copy-btn" data-copy-target="vin-${index}" title="Copy VIN">⧉</button>
             </div>
-
             <div class="cell cell-packages">
               <div class="tooltip">
                 <span class="packages-short">${packageDisplay}</span>
@@ -1099,9 +1097,7 @@
                 }
               </div>
             </div>
-
             <div class="cell cell-msrp">${vehicle.msrp || "-"}</div>
-
             <div class="cell cell-dealer">
               <div class="tooltip">
                 <span>${vehicle.dealer || "-"}</span>
