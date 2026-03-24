@@ -19,90 +19,65 @@
     }
 
     .topbar {
-      background: #3e434a;
-      color: #fff;
-      height: 54px;
+      background: #ffffff;
+      color: #2f3338;
+      height: 74px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      font-size: 15px;
-      font-weight: 600;
+      padding: 0 32px;
+      border-bottom: 1px solid #dddddd;
     }
 
     .topbar-left {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .menu-icon {
-      font-size: 20px;
-      line-height: 1;
-      opacity: 0.9;
-    }
-
-    .topbar-center {
-      font-size: 15px;
-      font-weight: 600;
-      opacity: 0.95;
-    }
-
-    .nav-row {
-      background: #fff;
-      border-bottom: 1px solid #d9d9d9;
-      display: flex;
-      align-items: center;
       gap: 54px;
-      padding: 0 52px;
-      height: 64px;
-      overflow-x: auto;
-    }
-
-    .nav-item {
-      text-decoration: none;
-      color: #2f3338;
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
-      padding-top: 4px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      border-top: 4px solid transparent;
+      overflow-x: auto;
       white-space: nowrap;
     }
 
-    .nav-item.active {
+    .topbar-left a {
+      text-decoration: none;
+      color: #2f3338;
+      padding-top: 4px;
+    }
+
+    .topbar-left a.active {
       color: #d71920;
-      border-top-color: #d71920;
     }
 
     .hero {
       position: relative;
-      height: 380px;
-      background:
-        linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18)),
-        url("https://speedwaymedia.com/wp-content/uploads/2022/12/2012-E90-BMW-M3-CRT.jpg") center center / cover no-repeat;
+      height: 455px;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.10)),
+        url("https://speedwaymedia.com/wp-content/uploads/2022/12/2012-E90-BMW-M3-CRT.jpg");
+      background-repeat: no-repeat;
+      background-position: center 30%;
+      background-size: cover;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
+      overflow: hidden;
     }
 
     .search-panel {
       width: 100%;
-      max-width: 920px;
+      max-width: 1100px;
       background: #f4f4f4;
-      border-radius: 14px;
-      padding: 26px 26px 18px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+      border-radius: 18px;
+      padding: 28px 30px 20px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.16);
     }
 
     .search-title {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 700;
       color: #d94831;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
     }
 
     .search-row {
@@ -111,19 +86,19 @@
 
     .search-input {
       width: 100%;
-      height: 56px;
+      height: 68px;
       border: none;
       outline: none;
-      border-radius: 6px;
-      background: #dedee2;
-      padding: 0 58px 0 18px;
-      font-size: 18px;
+      border-radius: 8px;
+      background: #dcdde1;
+      padding: 0 64px 0 22px;
+      font-size: 22px;
       color: #222;
     }
 
     .search-btn {
       position: absolute;
-      right: 14px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       border: none;
@@ -135,19 +110,21 @@
 
     .hero-recent {
       position: absolute;
-      bottom: 18px;
+      bottom: 24px;
       left: 50%;
       transform: translateX(-50%);
       color: white;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 18px;
+      font-weight: 700;
       text-shadow: 0 1px 6px rgba(0,0,0,0.45);
+      text-align: center;
+      padding: 0 12px;
     }
 
     .page {
-      max-width: 1500px;
+      max-width: 1760px;
       margin: 0 auto;
-      padding: 24px 28px 60px;
+      padding: 24px 36px 60px;
     }
 
     .overview-bar {
@@ -160,26 +137,27 @@
     }
 
     .overview-title {
-      font-size: 16px;
+      font-size: 20px;
       font-weight: 700;
-      padding-left: 4px;
+      padding-left: 6px;
     }
 
     .custom-view-btn {
       background: white;
       border: 1px solid #d2d2d2;
-      border-radius: 8px;
-      padding: 12px 18px;
-      font-size: 16px;
+      border-radius: 10px;
+      padding: 14px 22px;
+      font-size: 18px;
       font-weight: 700;
       color: #d71920;
+      cursor: pointer;
     }
 
     .panel {
       background: #fff;
       border: 1px solid #d8d8d8;
-      border-radius: 14px;
-      padding: 18px 20px 12px;
+      border-radius: 18px;
+      padding: 22px 24px 18px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
 
@@ -189,15 +167,15 @@
       align-items: center;
       gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .left-controls {
       display: flex;
       border: 1px solid #cfcfcf;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow: hidden;
-      min-width: 290px;
+      min-width: 340px;
     }
 
     .control-btn {
@@ -206,9 +184,9 @@
       color: #1f1f1f;
       font-size: 18px;
       font-weight: 700;
-      padding: 14px 26px;
+      padding: 16px 34px;
       cursor: pointer;
-      min-width: 135px;
+      min-width: 150px;
     }
 
     .control-btn.active {
@@ -218,18 +196,18 @@
 
     .right-controls {
       display: flex;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
     .filter-box {
-      min-width: 170px;
+      min-width: 200px;
       background: #efefef;
       color: #222;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
-      border-radius: 4px;
-      padding: 14px 18px;
+      border-radius: 6px;
+      padding: 16px 20px;
       text-align: center;
     }
 
@@ -240,24 +218,24 @@
 
     .results-header {
       display: grid;
-      grid-template-columns: 1.8fr 1.2fr 1fr 1fr 1fr;
-      gap: 14px;
-      font-size: 13px;
+      grid-template-columns: 1.7fr 1.25fr 0.8fr 1.3fr 1.3fr;
+      gap: 16px;
+      font-size: 14px;
       font-weight: 800;
       text-transform: uppercase;
       color: #5a5a5a;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-bottom: 1px solid #ececec;
     }
 
     .result-row {
       display: grid;
-      grid-template-columns: 1.8fr 1.2fr 1fr 1fr 1fr;
-      gap: 14px;
+      grid-template-columns: 1.7fr 1.25fr 0.8fr 1.3fr 1.3fr;
+      gap: 16px;
       align-items: center;
-      padding: 14px 12px;
+      padding: 16px 14px;
       border-bottom: 1px solid #ececec;
-      font-size: 15px;
+      font-size: 16px;
     }
 
     .result-row:hover {
@@ -280,8 +258,8 @@
     }
 
     .status {
-      padding: 14px 12px;
-      font-size: 15px;
+      padding: 16px 14px;
+      font-size: 16px;
       color: #555;
     }
 
@@ -289,44 +267,87 @@
       display: none;
     }
 
-    @media (max-width: 1000px) {
-      .nav-row {
-        gap: 24px;
-        padding: 0 20px;
-      }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
 
+    @media (max-width: 1100px) {
       .results-header,
       .result-row {
-        grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr;
-        font-size: 14px;
+        grid-template-columns: 1.4fr 1.1fr 0.8fr 1.1fr 1.1fr;
+      }
+
+      .filter-box {
+        min-width: 160px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .topbar {
+        padding: 0 18px;
+      }
+
+      .topbar-left {
+        gap: 24px;
+        font-size: 16px;
+      }
+
+      .page {
+        padding: 18px 14px 40px;
+      }
+
+      .toolbar {
+        align-items: stretch;
+      }
+
+      .left-controls {
+        min-width: unset;
+        width: 100%;
+      }
+
+      .right-controls {
+        width: 100%;
+      }
+
+      .filter-box {
+        flex: 1 1 140px;
+        min-width: 140px;
+      }
+
+      .hero {
+        height: 400px;
+        background-position: center 35%;
+      }
+
+      .search-panel {
+        padding: 22px 18px 16px;
+      }
+
+      .search-title {
+        font-size: 25px;
+      }
+
+      .search-input {
+        height: 58px;
+        font-size: 18px;
+      }
+
+      .hero-recent {
+        font-size: 16px;
       }
     }
 
     @media (max-width: 760px) {
-      .hero {
-        height: 330px;
-      }
-
-      .search-panel {
-        padding: 20px 18px 16px;
-      }
-
-      .search-title {
-        font-size: 24px;
-      }
-
-      .page {
-        padding: 18px 12px 40px;
-      }
-
       .results-header {
         display: none;
       }
 
       .result-row {
         grid-template-columns: 1fr;
-        gap: 6px;
-        padding: 14px 12px;
+        gap: 8px;
       }
 
       .result-cell::before {
@@ -334,26 +355,24 @@
         font-weight: 700;
         color: #555;
       }
+
+      .hero {
+        height: 340px;
+        background-position: center 30%;
+      }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-left">
-      <div class="menu-icon">☰</div>
-      <div>Dashboard</div>
+      <a href="#" class="active">Vehicles Dashboard</a>
+      <a href="#">Dashboard</a>
+      <a href="#">Vehicle Management</a>
+      <a href="#">Inquiries And Reports</a>
+      <a href="#">Sales Application</a>
     </div>
-    <div class="topbar-center">M Database</div>
-    <div></div>
   </header>
-
-  <nav class="nav-row">
-    <a href="#" class="nav-item active">Vehicles Dashboard</a>
-    <a href="#" class="nav-item">Dashboard</a>
-    <a href="#" class="nav-item">Vehicle Management</a>
-    <a href="#" class="nav-item">Inquiries And Reports</a>
-    <a href="#" class="nav-item">Sales Application</a>
-  </nav>
 
   <section class="hero">
     <div class="search-panel">
@@ -412,6 +431,50 @@
       <div id="emptyState" class="status hidden">
         Start typing above to search the linked F87 M2 CSV files.
       </div>
+    </section>
+
+    <section class="panel" style="margin-top: 24px;">
+      <div class="section-title">My BMW Series</div>
+
+      <div class="toolbar">
+        <div class="left-controls">
+          <button class="control-btn active" type="button">Grouped</button>
+          <button class="control-btn" type="button">A-Z ▼</button>
+        </div>
+
+        <div class="right-controls">
+          <div class="filter-box">BMW M SERIES</div>
+          <div class="filter-box">DATABASES</div>
+          <div class="filter-box">CSV FILES</div>
+          <div class="filter-box">OPEN</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="results-header">
+        <div>Series</div>
+        <div>Generation</div>
+        <div>Body Style</div>
+        <div>CSV File</div>
+        <div>Open</div>
+      </div>
+
+      <a class="result-row" href="f87-m2-database.html" style="text-decoration:none; color:inherit;">
+        <div class="result-main">F87 M2</div>
+        <div class="result-cell" data-label="Generation">F87</div>
+        <div class="result-cell" data-label="Body Style">Coupe</div>
+        <div class="result-cell" data-label="CSV File">2016 F87 M2.csv / 2017 F87 M2.csv</div>
+        <div class="result-cell" data-label="Open" style="color:#1f73ff; font-weight:700;">Open</div>
+      </a>
+
+      <a class="result-row" href="e90-m3-database.html" style="text-decoration:none; color:inherit;">
+        <div class="result-main">E90 M3</div>
+        <div class="result-cell" data-label="Generation">E90</div>
+        <div class="result-cell" data-label="Body Style">Sedan</div>
+        <div class="result-cell" data-label="CSV File">E90 M3 Data.csv</div>
+        <div class="result-cell" data-label="Open" style="color:#1f73ff; font-weight:700;">Open</div>
+      </a>
     </section>
   </main>
 
@@ -529,6 +592,15 @@
       return Object.values(row).join(" ").toLowerCase();
     }
 
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
     function renderResults(matches, term) {
       resultsList.innerHTML = "";
 
@@ -543,7 +615,7 @@
       emptyState.classList.add("hidden");
 
       if (!matches.length) {
-        resultsList.innerHTML = `<div class="status">No matches found for "${term}".</div>`;
+        resultsList.innerHTML = `<div class="status">No matches found for "${escapeHtml(term)}".</div>`;
         return;
       }
 
@@ -573,15 +645,6 @@
       });
     }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
     function updateRecent(term) {
       if (!term.trim()) return;
 
@@ -604,7 +667,10 @@
 
       updateRecent(searchInput.value.trim());
 
-      const matches = allRows.filter(row => getRowText(row).includes(term)).slice(0, 100);
+      const matches = allRows
+        .filter(row => getRowText(row).includes(term))
+        .slice(0, 100);
+
       renderResults(matches, searchInput.value.trim());
     }
 
