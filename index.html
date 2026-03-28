@@ -301,7 +301,7 @@
     .results-header,
     .result-row {
       display: grid;
-      grid-template-columns: 1.25fr 1.4fr 0.95fr 1.1fr 1.25fr 0.8fr;
+      grid-template-columns: 1.15fr 1.35fr 0.9fr 0.8fr 1.2fr 1.1fr 0.8fr;
       gap: 14px;
       align-items: center;
       padding: 14px 12px;
@@ -372,10 +372,13 @@
 
     @media (max-width: 1200px) {
       .results-header,
+      .result-row {
+        grid-template-columns: 1.1fr 1.2fr 0.9fr 0.8fr 1.1fr 1fr 0.8fr;
+      }
+
       .series-header,
-      .result-row,
       .series-row {
-        grid-template-columns: 1.1fr 1.25fr 0.9fr 1fr 1.15fr 0.8fr;
+        grid-template-columns: 1.2fr 1fr 1fr 1.2fr 0.8fr;
       }
 
       .filter-box {
@@ -546,6 +549,7 @@
           <div>Last 7</div>
           <div>Year</div>
           <div>Details</div>
+          <div>Monroney</div>
           <div>Source</div>
         </div>
         <div id="resultsList"></div>
@@ -563,7 +567,7 @@
         <div>Open</div>
       </div>
 
-            <div class="series-row">
+      <div class="series-row">
         <div class="series-main">F87 M2</div>
         <div class="series-cell" data-label="Generation">F87</div>
         <div class="series-cell" data-label="Body Style">Coupe</div>
@@ -572,7 +576,7 @@
           <a class="open-link" href="F87%20M2.html">Open</a>
         </div>
       </div>
-      
+
       <div class="series-row">
         <div class="series-main">E90 M3</div>
         <div class="series-cell" data-label="Generation">E90</div>
@@ -659,7 +663,10 @@
 
       for (let i = 1; i < lines.length; i++) {
         const values = parseCSVLine(lines[i]);
-        const row = { __sourceFile: sourceFile };
+        const row = {
+          __sourceFile: sourceFile,
+          __values: values
+        };
 
         headers.forEach((header, index) => {
           row[header] = values[index] || "";
@@ -753,7 +760,15 @@
       ]);
 
       const parts = [color, interior, transmission].filter(Boolean);
-      return parts.length ? parts.join(" • ") : "BMW M2 record";
+      return parts.length ? parts.join(" • ") : "BMW record";
+    }
+
+    function normalizeVin(value) {
+      return String(value || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    }
+
+    function getMonroneyLink(row) {
+      return (row.__values && row.__values[19] ? row.__values[19].trim() : "");
     }
 
     function getSearchText(row) {
@@ -770,6 +785,23 @@
       if (recentTerms.length > 3) recentTerms.pop();
 
       recentSearches.textContent = "Recent searches: " + recentTerms.join(" | ");
+    }
+
+    function renderMonroneyUnavailable() {
+      resultsSection.classList.remove("hidden");
+      emptyState.classList.add("hidden");
+      resultsList.innerHTML = `<div class="status">Monroney Unavailable</div>`;
+    }
+
+    function openMonroney(row) {
+      const link = getMonroneyLink(row);
+
+      if (!link) {
+        renderMonroneyUnavailable();
+        return;
+      }
+
+      window.open(link, "_blank");
     }
 
     function renderResults(matches, term) {
@@ -790,9 +822,12 @@
         return;
       }
 
-      matches.forEach(row => {
+      matches.forEach((row, index) => {
         const item = document.createElement("div");
         item.className = "result-row";
+
+        const monroneyLink = getMonroneyLink(row);
+        const rowId = `row-${index}-${Math.random().toString(36).slice(2, 9)}`;
 
         item.innerHTML = `
           <div class="result-main">${escapeHtml(getBestTitle(row))}</div>
@@ -800,28 +835,54 @@
           <div class="result-cell" data-label="Last 7">${escapeHtml(getBestLast7(row) || "—")}</div>
           <div class="result-cell" data-label="Year">${escapeHtml(getBestYear(row) || "—")}</div>
           <div class="result-cell muted" data-label="Details">${escapeHtml(getBestDetails(row))}</div>
+          <div class="result-cell" data-label="Monroney">
+            ${
+              monroneyLink
+                ? `<a class="open-link" href="${escapeHtml(monroneyLink)}" target="_blank" rel="noopener noreferrer">Open Monroney</a>`
+                : `<span class="muted">Unavailable</span>`
+            }
+          </div>
           <div class="result-cell" data-label="Source">${escapeHtml(row.__sourceFile || "—")}</div>
         `;
+
+        if (monroneyLink) {
+          item.style.cursor = "pointer";
+          item.addEventListener("dblclick", () => openMonroney(row));
+          item.title = "Double-click row to open Monroney";
+        }
 
         resultsList.appendChild(item);
       });
     }
 
     function runSearch() {
-      const term = searchInput.value.trim().toLowerCase();
+      const rawTerm = searchInput.value.trim();
+      const term = rawTerm.toLowerCase();
+      const normalizedTerm = normalizeVin(rawTerm);
 
-      if (!term) {
+      if (!rawTerm) {
         renderResults([], "");
         return;
       }
 
-      updateRecent(searchInput.value.trim());
+      updateRecent(rawTerm);
+
+      const exactVinMatch = allRows.find(row => {
+        const vin = normalizeVin(getBestVin(row));
+        const last7 = normalizeVin(getBestLast7(row));
+        return vin === normalizedTerm || last7 === normalizedTerm;
+      });
+
+      if (exactVinMatch) {
+        openMonroney(exactVinMatch);
+        return;
+      }
 
       const matches = allRows
         .filter(row => getSearchText(row).includes(term))
         .slice(0, 100);
 
-      renderResults(matches, searchInput.value.trim());
+      renderResults(matches, rawTerm);
     }
 
     async function loadCSVs() {
