@@ -563,23 +563,24 @@
         <div>Open</div>
       </div>
 
-      <div class="series-row">
+            <div class="series-row">
         <div class="series-main">F87 M2</div>
         <div class="series-cell" data-label="Generation">F87</div>
         <div class="series-cell" data-label="Body Style">Coupe</div>
-        <div class="series-cell muted" data-label="Notes">Live search enabled</div>
+        <div class="series-cell muted" data-label="Notes">Separate page</div>
         <div class="series-cell" data-label="Open">
-          <a class="open-link" href="https://sman19.github.io/2017-BMW-M2-Active-Website/">Open</a>
+          <a class="open-link" href="F87%20M2.html">Open</a>
+          <a class="open-link" href="E90%20Sedan.html">Open</a>
         </div>
       </div>
-
+      
       <div class="series-row">
         <div class="series-main">E90 M3</div>
         <div class="series-cell" data-label="Generation">E90</div>
         <div class="series-cell" data-label="Body Style">Sedan</div>
         <div class="series-cell muted" data-label="Notes">Separate page</div>
         <div class="series-cell" data-label="Open">
-          <a class="open-link" href="e90-m3-database.html">Open</a>
+          <a class="open-link" href="E90%20Sedan.html">Open</a>
         </div>
       </div>
     </section>
@@ -753,7 +754,7 @@
       ]);
 
       const parts = [color, interior, transmission].filter(Boolean);
-      return parts.length ? parts.join(" • ") : "F87 M2 record";
+      return parts.length ? parts.join(" • ") : "BMW M2 record";
     }
 
     function getSearchText(row) {
@@ -778,7 +779,7 @@
       if (!term.trim()) {
         resultsSection.classList.add("hidden");
         emptyState.classList.remove("hidden");
-        emptyState.textContent = "Start typing above to search the linked F87 M2 CSV files.";
+        emptyState.textContent = "Start typing above to search the linked BMW CSV files.";
         return;
       }
 
