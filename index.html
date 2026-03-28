@@ -370,6 +370,57 @@
       height: 18px;
     }
 
+    .monroney-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 5000;
+    }
+
+    .monroney-modal {
+      width: min(900px, 96vw);
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.24);
+      padding: 34px 28px 24px;
+      text-align: center;
+    }
+
+    .monroney-modal-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #d94831;
+      margin-bottom: 16px;
+    }
+
+    .monroney-modal-text {
+      font-size: 22px;
+      line-height: 1.45;
+      color: #202124;
+      margin-bottom: 24px;
+      word-break: break-word;
+    }
+
+    .monroney-modal-btn {
+      border: none;
+      background: #1f73ff;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+      min-width: 140px;
+    }
+
+    .monroney-modal-btn:hover {
+      background: #165fd3;
+    }
+
     @media (max-width: 1200px) {
       .results-header,
       .result-row {
@@ -448,6 +499,14 @@
 
       .hero-recent {
         font-size: 16px;
+      }
+
+      .monroney-modal-title {
+        font-size: 28px;
+      }
+
+      .monroney-modal-text {
+        font-size: 18px;
       }
     }
 
@@ -589,6 +648,16 @@
     </section>
   </main>
 
+  <div id="monroneyOverlay" class="monroney-overlay hidden">
+    <div class="monroney-modal">
+      <div class="monroney-modal-title">Monroney Unavailable</div>
+      <div id="monroneyModalText" class="monroney-modal-text">
+        No Monroney PDF is available for this vehicle.
+      </div>
+      <button id="closeMonroneyModal" class="monroney-modal-btn" type="button">Cancel</button>
+    </div>
+  </div>
+
   <script>
     const CSV_FILES = [
       "2016 F87 M2.csv",
@@ -611,6 +680,10 @@
     const userMenuBtn = document.getElementById("userMenuBtn");
     const userDropdown = document.getElementById("userDropdown");
     const authUsername = document.getElementById("auth-username");
+
+    const monroneyOverlay = document.getElementById("monroneyOverlay");
+    const monroneyModalText = document.getElementById("monroneyModalText");
+    const closeMonroneyModal = document.getElementById("closeMonroneyModal");
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -802,17 +875,29 @@
       recentSearches.textContent = "Recent searches: " + recentTerms.join(" | ");
     }
 
-    function renderMonroneyUnavailable() {
-      resultsSection.classList.remove("hidden");
-      emptyState.classList.add("hidden");
-      resultsList.innerHTML = `<div class="status">Monroney Unavailable</div>`;
+    function renderMonroneyUnavailable(row = null) {
+      const vin = row ? getBestVin(row) : "";
+      const last7 = row ? getBestLast7(row) : "";
+
+      if (vin || last7) {
+        monroneyModalText.textContent =
+          `No Monroney PDF is currently available for this vehicle.${vin ? " VIN: " + vin : ""}${!vin && last7 ? " Last 7: " + last7 : ""}`;
+      } else {
+        monroneyModalText.textContent = "No Monroney PDF is currently available for this vehicle.";
+      }
+
+      monroneyOverlay.classList.remove("hidden");
+    }
+
+    function closeMonroneyUnavailable() {
+      monroneyOverlay.classList.add("hidden");
     }
 
     function openMonroney(row) {
       const link = getMonroneyLink(row);
 
       if (!link) {
-        renderMonroneyUnavailable();
+        renderMonroneyUnavailable(row);
         return;
       }
 
@@ -949,6 +1034,14 @@
     document.addEventListener("click", function (event) {
       if (!userDropdown.contains(event.target) && !userMenuBtn.contains(event.target)) {
         userDropdown.classList.add("hidden");
+      }
+    });
+
+    closeMonroneyModal.addEventListener("click", closeMonroneyUnavailable);
+
+    monroneyOverlay.addEventListener("click", function (event) {
+      if (event.target === monroneyOverlay) {
+        closeMonroneyUnavailable();
       }
     });
 
