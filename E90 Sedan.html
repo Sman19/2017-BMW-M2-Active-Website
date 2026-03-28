@@ -496,7 +496,7 @@
     <!-- TOP NAV BAR -->
     <header class="top-nav">
       <div class="top-nav-left">
-        <span class="top-nav-home">Home</span>
+       <a class="top-nav-home" href="Home.html">Home</a>
       </div>
       <div class="top-nav-center">
         <span>E9x M3 U.S</span>
@@ -825,7 +825,7 @@
 
     async function loadReferenceData() {
       try {
-        const response = await fetch("main.csv");
+        const response = await fetch("2011%20E90%20M3%20Sedan.csv");
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const csvText = await response.text();
@@ -1072,7 +1072,7 @@
           <div style="padding: 40px; text-align: center; color: #dc3545;">
             <h3>⚠️ Error Loading Data</h3>
             <p>${err.message}</p>
-            <p>Please ensure main.csv is in the same directory as this HTML file.</p>
+            <p>Please ensure 2011 E90 M3 Sedan.csv is in the same directory as this HTML file.</p>
           </div>
         `;
       }
