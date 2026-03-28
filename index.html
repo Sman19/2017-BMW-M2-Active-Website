@@ -767,8 +767,23 @@
       return String(value || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     }
 
+    function convertGitHubPdfLink(link) {
+      if (!link) return "";
+
+      let fixed = String(link).trim();
+
+      if (fixed.includes("github.com") && fixed.includes("/blob/")) {
+        fixed = fixed
+          .replace("https://github.com/", "https://raw.githubusercontent.com/")
+          .replace("/blob/", "/");
+      }
+
+      return fixed;
+    }
+
     function getMonroneyLink(row) {
-      return (row.__values && row.__values[19] ? row.__values[19].trim() : "");
+      const rawLink = row.__values && row.__values[19] ? row.__values[19].trim() : "";
+      return convertGitHubPdfLink(rawLink);
     }
 
     function getSearchText(row) {
@@ -801,7 +816,7 @@
         return;
       }
 
-      window.open(link, "_blank");
+      window.open(link, "_blank", "noopener,noreferrer");
     }
 
     function renderResults(matches, term) {
@@ -822,12 +837,11 @@
         return;
       }
 
-      matches.forEach((row, index) => {
+      matches.forEach((row) => {
         const item = document.createElement("div");
         item.className = "result-row";
 
         const monroneyLink = getMonroneyLink(row);
-        const rowId = `row-${index}-${Math.random().toString(36).slice(2, 9)}`;
 
         item.innerHTML = `
           <div class="result-main">${escapeHtml(getBestTitle(row))}</div>
