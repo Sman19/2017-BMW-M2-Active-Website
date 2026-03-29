@@ -117,6 +117,9 @@
       font-size: 15px;
       color: #222;
       outline: none;
+      border-radius: 0;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     .login-input:focus {
@@ -154,6 +157,8 @@
       font-weight: 700;
       cursor: pointer;
       text-transform: uppercase;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     .login-button:hover {
@@ -204,9 +209,20 @@
       z-index: 2;
       pointer-events: none;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+      white-space: nowrap;
     }
 
     @media (max-width: 700px) {
+      html,
+      body {
+        overflow: auto;
+        min-height: 100%;
+      }
+
+      body {
+        min-height: 100vh;
+      }
+
       .top-strip {
         height: 74px;
       }
@@ -220,6 +236,9 @@
 
       .login-stage {
         padding-top: 88px;
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-bottom: 28px;
       }
 
       .login-card {
@@ -244,6 +263,75 @@
       .bumper-text {
         bottom: 198px;
         font-size: 13px;
+      }
+    }
+
+    /* iPhone / iPad tweaks */
+    @media (max-width: 700px) {
+      .ios-device .login-stage {
+        padding-top: 78px;
+      }
+
+      .ios-device .login-card {
+        max-width: 300px;
+      }
+
+      .ios-device .login-input {
+        font-size: 16px;
+      }
+
+      .ios-device .login-label {
+        font-size: 15px;
+      }
+
+      .ios-device .remember-row {
+        font-size: 14px;
+      }
+
+      .ios-device .login-links {
+        font-size: 13px;
+      }
+
+      .ios-device .top-logo {
+        width: 44px;
+        height: 44px;
+      }
+
+      .ios-device .bumper-text {
+        bottom: 188px;
+        font-size: 12px;
+      }
+    }
+
+    /* Android tweaks */
+    @media (max-width: 700px) {
+      .android-device .login-stage {
+        padding-top: 84px;
+      }
+
+      .android-device .login-card {
+        max-width: 300px;
+      }
+
+      .android-device .login-input {
+        font-size: 15px;
+      }
+
+      .android-device .login-label {
+        font-size: 15px;
+      }
+
+      .android-device .remember-row {
+        font-size: 14px;
+      }
+
+      .android-device .login-links {
+        font-size: 13px;
+      }
+
+      .android-device .bumper-text {
+        bottom: 192px;
+        font-size: 12px;
       }
     }
   </style>
@@ -327,6 +415,17 @@
 
   <script type="text/javascript" src="https://www.authpro.com/js/aform.js?1711251"></script>
   <script>
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+
+    const isIOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    const isAndroid = /Android/.test(ua);
+
+    if (isIOS) document.documentElement.classList.add("ios-device");
+    if (isAndroid) document.documentElement.classList.add("android-device");
+
     const errEl = document.getElementById("ap_form_errmes");
     const infoEl = document.getElementById("ap_form_infmes");
 
