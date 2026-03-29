@@ -29,7 +29,7 @@
     body {
       position: relative;
       background:
-        linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)),
+        linear-gradient(rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18)),
         url("https://raw.githubusercontent.com/Sman19/2017-BMW-M2-Active-Website/2525b21e9ace94c054370ce981c41a612d5f9a6d/crtrep%20login.png")
         no-repeat center center / cover;
     }
@@ -47,7 +47,7 @@
 
     .top-logo {
       position: absolute;
-      top: 28px;
+      top: 30px;
       left: 42px;
       width: 58px;
       height: 58px;
@@ -59,15 +59,16 @@
       position: absolute;
       inset: 0;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding-top: 115px;
       z-index: 3;
     }
 
     .login-card {
-      width: 370px;
+      width: 424px;
       background: #efefef;
-      border-radius: 16px;
+      border-radius: 18px;
       overflow: hidden;
       box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28);
     }
@@ -83,15 +84,15 @@
     }
 
     .login-body {
-      padding: 26px 18px 12px;
+      padding: 28px 18px 12px;
     }
 
     .login-row {
       display: grid;
-      grid-template-columns: 110px 1fr;
+      grid-template-columns: 120px 1fr;
       align-items: center;
-      column-gap: 10px;
-      margin-bottom: 12px;
+      column-gap: 16px;
+      margin-bottom: 14px;
     }
 
     .login-label {
@@ -103,11 +104,11 @@
 
     .login-input {
       width: 100%;
-      height: 54px;
+      height: 62px;
       background: #d8dee9;
       border: none;
       border-bottom: 2px solid #7a7a7a;
-      padding: 0 10px;
+      padding: 0 12px;
       font-size: 16px;
       color: #222;
       outline: none;
@@ -121,7 +122,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 18px 0 20px 118px;
+      margin: 14px 0 20px 136px;
       font-size: 17px;
       color: #2f2f2f;
     }
@@ -133,13 +134,13 @@
     }
 
     .button-wrap {
-      margin-left: 118px;
+      margin-left: 136px;
       margin-bottom: 18px;
     }
 
     .login-button {
-      width: 214px;
-      height: 52px;
+      width: 246px;
+      height: 54px;
       border: none;
       border-radius: 18px;
       background: #0a1ea8;
@@ -155,7 +156,7 @@
     }
 
     .login-links {
-      padding: 0 14px 14px;
+      padding: 0 14px 18px;
       font-size: 17px;
       line-height: 1.45;
     }
@@ -186,6 +187,20 @@
       font-weight: 700;
     }
 
+    .bumper-text {
+      position: absolute;
+      left: 50%;
+      bottom: 246px;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      z-index: 2;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+    }
+
     @media (max-width: 700px) {
       .top-strip {
         height: 74px;
@@ -198,9 +213,13 @@
         height: 48px;
       }
 
+      .login-stage {
+        padding-top: 95px;
+      }
+
       .login-card {
         width: 92vw;
-        max-width: 370px;
+        max-width: 424px;
       }
 
       .login-row {
@@ -216,6 +235,11 @@
       .login-button {
         width: 100%;
       }
+
+      .bumper-text {
+        bottom: 190px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -227,6 +251,8 @@
     src="https://raw.githubusercontent.com/Sman19/2017-BMW-M2-Active-Website/2525b21e9ace94c054370ce981c41a612d5f9a6d/carbo-insta_1080x1080%20Favicon.png"
     alt="CarboiCreations"
   />
+
+  <div class="bumper-text">CARBOI-CREATIONS</div>
 
   <div class="login-stage">
     <div class="login-card">
@@ -300,12 +326,8 @@
     const infoEl = document.getElementById("ap_form_infmes");
 
     const observer = new MutationObserver(() => {
-      if (errEl.textContent.trim()) {
-        errEl.style.display = "block";
-      }
-      if (infoEl.textContent.trim()) {
-        infoEl.style.display = "block";
-      }
+      if (errEl.textContent.trim()) errEl.style.display = "block";
+      if (infoEl.textContent.trim()) infoEl.style.display = "block";
     });
 
     observer.observe(errEl, { childList: true, subtree: true });
