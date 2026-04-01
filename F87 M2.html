@@ -13,8 +13,8 @@
     href="https://raw.githubusercontent.com/Sman19/Functioning-Website/ac241a80e9369136c2629f014a56dfff7f28fa03/carbo-insta_1080x1080%20Favicon.png"
   />
 
-  <!-- AuthPro page protection -->
   <script type="text/javascript" src="https://www.authpro.com/auth/sman201/?action=pp"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -66,7 +66,7 @@
       color: #ffffff;
       text-decoration: none;
     }
-    
+
     .top-nav-home:hover {
       text-decoration: underline;
     }
@@ -154,20 +154,22 @@
     }
 
     .left-sidebar {
-      width: 240px;
-      min-width: 240px;
+      width: 320px;
+      min-width: 320px;
       background: #f3f4f6;
       border-right: 1px solid #d1d5db;
       padding: 18px 14px;
       position: relative;
       transition: width 0.25s ease, min-width 0.25s ease, padding 0.25s ease;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .left-sidebar.collapsed {
       width: 44px;
       min-width: 44px;
       padding: 18px 6px;
+      overflow: hidden;
     }
 
     .left-sidebar.collapsed .sidebar-content {
@@ -190,6 +192,7 @@
       justify-content: center;
       font-size: 14px;
       font-weight: 700;
+      z-index: 5;
     }
 
     .sidebar-toggle:hover {
@@ -231,6 +234,19 @@
 
     .sidebar-select:focus {
       border-color: #2563eb;
+    }
+
+    .sidebar-chart-card {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .sidebar-chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 220px;
     }
 
     .main-content {
@@ -666,6 +682,32 @@
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1000px) {
+      .left-sidebar {
+        width: 280px;
+        min-width: 280px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .top-nav {
+        padding: 0 16px;
+      }
+
+      .owner-row {
+        padding: 16px 16px 8px;
+      }
+
+      .summary-row {
+        padding: 8px 16px;
+      }
+
+      .left-sidebar {
+        width: 260px;
+        min-width: 260px;
+      }
+    }
   </style>
 </head>
 
@@ -715,6 +757,33 @@
               <option value="2017 F87 M2.csv">2017 M2</option>
             </select>
           </div>
+
+          <div class="sidebar-section">
+            <label class="sidebar-label" for="sidebar-year-filter">Model Year</label>
+            <select id="sidebar-year-filter" class="sidebar-select" onchange="handleSidebarYearFilter(this.value)">
+              <option value="">All Years</option>
+              <option value="2016">2016</option>
+              <option value="2017">2017</option>
+            </select>
+          </div>
+
+          <div class="sidebar-section">
+            <label class="sidebar-label">Exterior Breakdown</label>
+            <div class="sidebar-chart-card">
+              <div class="sidebar-chart-wrap">
+                <canvas id="exteriorPieChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <label class="sidebar-label">Transmission Breakdown</label>
+            <div class="sidebar-chart-card">
+              <div class="sidebar-chart-wrap">
+                <canvas id="transmissionPieChart"></canvas>
+              </div>
+            </div>
+          </div>
         </div>
       </aside>
 
@@ -726,8 +795,6 @@
               <span id="count">0</span> of <span id="total-count">0</span> Vehicle(s)
             </span>
             <span class="badge-m2">M2</span>
-        
-            <!-- add here -->
             <div id="active-filters" class="active-filters-inline"></div>
           </div>
         </div>
@@ -834,6 +901,11 @@
     const interiorLookup = {};
     const packageLookup = {};
     let currentCsvFile = "2016 F87 M2.csv";
+    let vehicles = [];
+    let filteredVehicles = [];
+    let selectedVehicles = new Set();
+    let exteriorPieChart = null;
+    let transmissionPieChart = null;
 
     const defaultColors = {
       "300": { rgb: "255, 255, 255", name: "Alpine White", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Alpine_White_380x260.png?raw=true" },
@@ -858,19 +930,17 @@
       "IND": "BMW Individual (Paint) - $5,000.00"
     };
 
-    const fieldSelectors = {
-      model: ".cell-model",
-      exterior: ".cell-exterior",
-      interior: ".cell-interior",
-      year: ".cell-year",
-      vin: ".cell-vin",
-      packages: ".cell-packages",
-      msrp: ".cell-msrp",
-      dealer: ".cell-dealer",
-    };
-
     function normalize(text) {
       return (text || "").toLowerCase().trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
     }
 
     function debounce(func, wait) {
@@ -888,15 +958,20 @@
 
     function syncDatasetDropdown() {
       const select = document.getElementById("dataset-select");
-      if (select) {
-        select.value = currentCsvFile;
-      }
+      if (select) select.value = currentCsvFile;
     }
 
     function handleDatasetChange(fileName) {
       const url = new URL(window.location.href);
       url.searchParams.set("file", fileName);
       window.location.href = url.toString();
+    }
+
+    function handleSidebarYearFilter(value) {
+      const yearInput = document.querySelector('.filter-input[data-field="year"]');
+      if (!yearInput) return;
+      yearInput.value = value;
+      applyFilters();
     }
 
     function toggleSidebar() {
@@ -943,145 +1018,6 @@
       }
     });
 
-    function applyFilters() {
-  const rows = document.querySelectorAll("#table-rows .table-row");
-  const inputs = document.querySelectorAll(".filter-input");
-  const activeFiltersContainer = document.getElementById("active-filters");
-
-  const filters = {};
-  if (activeFiltersContainer) activeFiltersContainer.innerHTML = "";
-
-  inputs.forEach((input) => {
-    const field = input.dataset.field;
-    const value = (input.value || "").trim();
-    if (value) filters[field] = value;
-  });
-
-  const fieldLabels = {
-    model: "Model",
-    exterior: "Exterior",
-    interior: "Interior",
-    year: "Year",
-    vin: "VIN",
-    packages: "Packages",
-    msrp: "MSRP",
-    dealer: "Dealer"
-  };
-
-  const filterKeys = Object.keys(filters);
-
-  if (activeFiltersContainer && filterKeys.length > 0) {
-    filterKeys.forEach((field) => {
-      const value = filters[field];
-
-      const chip = document.createElement("div");
-      chip.className = "filter-chip";
-      chip.innerHTML = `
-        ${fieldLabels[field] || field}: ${value}
-        <span class="filter-chip-remove" data-field="${field}">✕</span>
-      `;
-      activeFiltersContainer.appendChild(chip);
-    });
-
-    const clearBtn = document.createElement("button");
-    clearBtn.className = "clear-filters-btn";
-    clearBtn.type = "button";
-    clearBtn.textContent = "Clear All";
-    clearBtn.onclick = clearAllFilters;
-    activeFiltersContainer.appendChild(clearBtn);
-  }
-
-  let visibleCount = 0;
-
-  rows.forEach((row) => {
-    let visible = true;
-
-    for (const field in filters) {
-      const selector = fieldSelectors[field];
-      if (!selector) continue;
-
-      const cell = row.querySelector(selector);
-      const cellText = normalize(cell ? cell.innerText : "");
-      const rawFilter = filters[field];
-
-      const parts = rawFilter
-        .split(",")
-        .map((p) => p.trim())
-        .filter(Boolean);
-
-      for (const part of parts) {
-        if (/^-\s*/.test(part)) {
-          const excludeTerm = normalize(part.replace(/^-\s*/, ""));
-          if (excludeTerm && cellText.includes(excludeTerm)) {
-            visible = false;
-            break;
-          }
-        } else {
-          const includeTerm = normalize(part);
-          if (includeTerm && !cellText.includes(includeTerm)) {
-            visible = false;
-            break;
-          }
-        }
-      }
-
-      if (!visible) break;
-    }
-
-    row.style.display = visible ? "flex" : "none";
-    if (visible) visibleCount++;
-  });
-
-  document.getElementById("count").textContent = visibleCount;
-}
-
-function clearAllFilters() {
-  document.querySelectorAll(".filter-input").forEach((input) => {
-    input.value = "";
-  });
-  applyFilters();
-}
-
-document.addEventListener("click", function (e) {
-  if (e.target.matches(".filter-chip-remove")) {
-    const field = e.target.dataset.field;
-    const input = document.querySelector(`.filter-input[data-field="${field}"]`);
-    if (input) {
-      input.value = "";
-      applyFilters();
-    }
-  }
-});    
-
-    function setupFilterInputs() {
-      const debouncedFilter = debounce(applyFilters, 300);
-      document.querySelectorAll(".filter-input").forEach((input) => {
-        input.addEventListener("input", debouncedFilter);
-      });
-    }
-
-    function initCopyButtons() {
-      document.querySelectorAll(".copy-btn").forEach((btn) => {
-        btn.onclick = () => {
-          const id = btn.dataset.copyTarget;
-          const el = document.getElementById(id);
-          if (!el) return;
-          const text = el.textContent.trim();
-
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-              btn.classList.add("copied");
-              btn.textContent = "✓";
-              setTimeout(() => {
-                btn.classList.remove("copied");
-                btn.textContent = "⧉";
-              }, 700);
-            });
-          }
-        };
-      });
-    }
-
     function parseCSVLine(line) {
       const result = [];
       let current = "";
@@ -1089,10 +1025,10 @@ document.addEventListener("click", function (e) {
 
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
-        const nextChar = line[i + 1];
+        const next = line[i + 1];
 
         if (char === '"') {
-          if (inQuotes && nextChar === '"') {
+          if (inQuotes && next === '"') {
             current += '"';
             i++;
           } else {
@@ -1110,286 +1046,466 @@ document.addEventListener("click", function (e) {
       return result;
     }
 
-    function extractPaintCode(exteriorStr) {
-      if (!exteriorStr) return "";
-      const raw = exteriorStr.replace(/\s+/g, " ").trim().toUpperCase();
+    function parseCSV(text) {
+      const lines = text
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .split("\n")
+        .filter(line => line.trim() !== "");
 
-      const dashMatch = raw.match(/^([A-Z0-9]{3,4})\s*-\s*/);
-      if (dashMatch) return dashMatch[1];
+      if (!lines.length) return [];
 
-      const spaceMatch = raw.match(/^([A-Z0-9]{3,4})\s+/);
-      if (spaceMatch) return spaceMatch[1];
+      const headers = parseCSVLine(lines[0]).map(h => h.trim());
 
+      return lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const row = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index] || "";
+        });
+        return row;
+      });
+    }
+
+    function getField(row, possibleNames) {
+      const keys = Object.keys(row);
+      for (const name of possibleNames) {
+        const foundKey = keys.find(key => key.toLowerCase().trim() === name.toLowerCase().trim());
+        if (foundKey && row[foundKey]) return row[foundKey];
+      }
       return "";
     }
 
-    function extractInteriorCode(interiorStr) {
-      if (!interiorStr) return "";
-      const raw = interiorStr.replace(/\s+/g, " ").trim();
-      const upper = raw.toUpperCase();
-
-      if (/^[A-Z0-9]{3,6}$/.test(upper)) return upper;
-
-      const dashMatch = raw.match(/^([A-Z0-9]+)\s*-\s*/i);
-      if (dashMatch) return dashMatch[1].trim().toUpperCase();
-
-      const spaceMatch = raw.match(/^([A-Z0-9]{3,6})\s+/i);
-      if (spaceMatch) return spaceMatch[1].trim().toUpperCase();
-
-      const low = raw.toLowerCase();
-      if (low.includes("fox red") && low.includes("extended")) return "NDH2";
-      if (low.includes("fox red")) return "NCH2";
-      if (low.includes("rust brown")) return "ZAP2";
-
-      return "";
+    function getColorData(codeOrName) {
+      const raw = (codeOrName || "").trim();
+      return defaultColors[raw] || Object.values(defaultColors).find(c => normalize(c.name) === normalize(raw)) || null;
     }
 
-    function looksLikeSectionHeader(text, expected) {
-      return normalize(text) === normalize(expected);
+    function getInteriorData(codeOrName) {
+      const raw = (codeOrName || "").trim();
+      return defaultInteriors[raw] || null;
     }
 
-    async function loadReferenceData() {
-      Object.keys(colorLookup).forEach(k => delete colorLookup[k]);
-      Object.keys(interiorLookup).forEach(k => delete interiorLookup[k]);
-      Object.keys(packageLookup).forEach(k => delete packageLookup[k]);
+    function getPackageDetail(code) {
+      return packageLookup[code] || defaultPackages[code] || code;
+    }
 
-      try {
-        const response = await fetch(currentCsvFile);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    function parsePackageCodes(value) {
+      return String(value || "")
+        .split(/[,\s]+/)
+        .map(v => v.trim())
+        .filter(Boolean);
+    }
 
-        const csvText = await response.text();
-        const lines = csvText.trim().split(/\r?\n/);
+    function buildVehicle(row) {
+      const exteriorCode = getField(row, ["EXTERIOR", "Exterior", "Color", "Paint Code", "PAINT"]);
+      const interiorCode = getField(row, ["INTERIOR", "Interior", "Trim", "Upholstery"]);
+      const year = getField(row, ["YEAR", "Year", "Model Year", "MY"]);
+      const vin = getField(row, ["VIN", "Vin", "Full VIN", "Full VIN Number"]);
+      const msrp = getField(row, ["MSRP", "Price", "Retail"]);
+      const dealer = getField(row, ["DEALER NAME", "Dealer Name", "Dealer"]);
+      const details = getField(row, ["DETAILS", "Details"]);
+      const vspec = getField(row, ["V-SPEC", "VSPEC", "VSpec"]);
+      const sticker = getField(row, ["STICKER", "Monroney", "Window Sticker"]);
+      const invoice = getField(row, ["INVOICE", "Invoice"]);
+      const model = getField(row, ["MODEL", "Model"]) || "M2";
 
-        let currentSection = "";
+      const packageCodesRaw = getField(row, ["Package Codes", "PACKAGE CODES", "PACKAGES", "Packages"]);
+      const packageCodes = parsePackageCodes(packageCodesRaw);
+      const packageDetails = packageCodes.map(code => getPackageDetail(code));
 
-        for (let i = 0; i < lines.length; i++) {
-          const cols = parseCSVLine(lines[i]);
+      const exteriorData = getColorData(exteriorCode);
+      const interiorData = getInteriorData(interiorCode);
 
-          if (cols[2] && cols[3] && looksLikeSectionHeader(cols[2], "Paint Code") && looksLikeSectionHeader(cols[3], "Paint Name")) {
-            currentSection = "exterior";
-            continue;
-          }
-          if (cols[2] && looksLikeSectionHeader(cols[2], "INTERIOR Code")) {
-            currentSection = "interior";
-            continue;
-          }
-          if (cols[2] && (looksLikeSectionHeader(cols[2], "Packages") || looksLikeSectionHeader(cols[2], "PACKAGES"))) {
-            currentSection = "packages";
-            continue;
-          }
+      return {
+        model,
+        exteriorCode,
+        exteriorName: exteriorData ? exteriorData.name : (exteriorCode || "-"),
+        exteriorImage: exteriorData ? exteriorData.image : "",
+        exteriorRgb: exteriorData ? exteriorData.rgb : "220,220,220",
+        interiorCode,
+        interiorName: interiorData ? interiorData.description : (interiorCode || "-"),
+        interiorImage: interiorData ? interiorData.image : "",
+        year,
+        vin,
+        packageCodes,
+        packageDetails,
+        packageText: packageDetails.length ? packageDetails.join(" | ") : (packageCodesRaw || "-"),
+        msrp,
+        dealer,
+        details,
+        vspec,
+        sticker,
+        invoice
+      };
+    }
 
-          if (cols.every((c) => !c || !c.trim())) continue;
+    function renderTable(data) {
+      const table = document.getElementById("table-rows");
 
-          if (currentSection === "exterior" && cols[2] && cols[2].trim()) {
-            const paintCode = cols[2].trim().toUpperCase();
-            if (paintCode && paintCode !== "PAINT CODE") {
-              colorLookup[paintCode] = {
-                rgb: cols[4] ? cols[4].trim() : "128,128,128",
-                name: cols[3] ? cols[3].trim() : "",
-                image: cols[5] ? cols[5].trim() : "",
-              };
+      if (!data.length) {
+        table.innerHTML = `
+          <div style="padding: 40px; text-align: center; color: #6b7280;">
+            <h3>No vehicles found</h3>
+          </div>
+        `;
+        return;
+      }
+
+      table.innerHTML = "";
+
+      data.forEach(vehicle => {
+        const row = document.createElement("div");
+        row.className = "table-row";
+        row.dataset.vin = vehicle.vin || "";
+
+        const packageDetailsHtml = vehicle.packageDetails
+          .map(detail => `<div>${escapeHtml(detail)}</div>`)
+          .join("");
+
+        row.innerHTML = `
+          <div class="cell cell-checkbox">
+            <input type="checkbox" ${selectedVehicles.has(vehicle.vin) ? "checked" : ""} />
+          </div>
+
+          <div class="cell cell-status">
+            <div class="status-circle">M</div>
+          </div>
+
+          <div class="cell cell-image">
+            ${
+              vehicle.exteriorImage
+                ? `<img class="exterior-thumbnail" src="${escapeHtml(vehicle.exteriorImage)}" alt="${escapeHtml(vehicle.exteriorName)}" />`
+                : `<div class="exterior-thumbnail"></div>`
             }
-          }
+          </div>
 
-          if (currentSection === "interior" && cols[2] && cols[2].trim()) {
-            const interiorCode = cols[2].trim().toUpperCase();
-            if (interiorCode && interiorCode !== "INTERIOR CODE") {
-              interiorLookup[interiorCode] = {
-                image: cols[5] ? cols[5].trim() : "",
-                description: cols[4] ? cols[4].trim() : "",
-              };
+          <div class="cell cell-model">
+            <span class="model-code">${escapeHtml(vehicle.model)}</span>
+          </div>
+
+          <div class="cell cell-exterior">
+            <div class="color-display">
+              <span class="color-circle" style="background: rgb(${escapeHtml(vehicle.exteriorRgb)});"></span>
+              <span>${escapeHtml(vehicle.exteriorName)}</span>
+            </div>
+          </div>
+
+          <div class="cell cell-interior">
+            <div class="interior-display">
+              ${
+                vehicle.interiorImage
+                  ? `<span class="interior-square" style="background-image:url('${escapeHtml(vehicle.interiorImage)}');"></span>`
+                  : `<span class="interior-square" style="background:#d1d5db;"></span>`
+              }
+              <span>${escapeHtml(vehicle.interiorName)}</span>
+            </div>
+          </div>
+
+          <div class="cell cell-year">${escapeHtml(vehicle.year || "-")}</div>
+
+          <div class="cell cell-vin">
+            <span class="vin-text">${escapeHtml(vehicle.vin || "-")}</span>
+            ${
+              vehicle.vin
+                ? `<button class="copy-btn" type="button" data-copy="${escapeHtml(vehicle.vin)}">Copy</button>`
+                : ""
             }
-          }
+          </div>
 
-          if (currentSection === "packages" && cols[2] && cols[2].trim()) {
-            const packageCode = cols[2].trim().toUpperCase();
-            if (packageCode && packageCode !== "PACKAGES" && cols[3]) {
-              let cleanDesc = cols[3].trim();
-              cleanDesc = cleanDesc.replace(/^["'\s]+|["'\s]+$/g, "");
-              cleanDesc = cleanDesc.replace(/\s+/g, " ");
-              if (cleanDesc) packageLookup[packageCode] = cleanDesc;
+          <div class="cell cell-packages">
+            <div class="tooltip">
+              <span class="packages-short">${escapeHtml(vehicle.packageText)}</span>
+              ${
+                vehicle.packageDetails.length
+                  ? `<div class="tooltiptext tooltip-packages"><strong>Package Details:</strong><br>${packageDetailsHtml}</div>`
+                  : ""
+              }
+            </div>
+          </div>
+
+          <div class="cell cell-msrp">${escapeHtml(vehicle.msrp || "-")}</div>
+
+          <div class="cell cell-dealer">
+            <div class="tooltip">
+              <span>${escapeHtml(vehicle.dealer || "-")}</span>
+              ${
+                vehicle.dealer
+                  ? `<div class="tooltiptext tooltip-red-content">${escapeHtml(vehicle.dealer)}</div>`
+                  : ""
+              }
+            </div>
+          </div>
+        `;
+
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener("change", function () {
+          handleCheckboxChange(this, vehicle);
+        });
+
+        table.appendChild(row);
+      });
+
+      initCopyButtons();
+    }
+
+    function initCopyButtons() {
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", async function () {
+          const value = this.dataset.copy || "";
+          try {
+            await navigator.clipboard.writeText(value);
+            const original = this.textContent;
+            this.textContent = "Copied";
+            this.classList.add("copied");
+            setTimeout(() => {
+              this.textContent = original;
+              this.classList.remove("copied");
+            }, 1200);
+          } catch (err) {
+            console.error("Copy failed:", err);
+          }
+        });
+      });
+    }
+
+    function getActiveFilters() {
+      const filters = {};
+      document.querySelectorAll(".filter-input").forEach(input => {
+        const field = input.dataset.field;
+        const value = (input.value || "").trim();
+        if (value) filters[field] = value;
+      });
+      return filters;
+    }
+
+    function removeFilter(field) {
+      const input = document.querySelector(`.filter-input[data-field="${field}"]`);
+      if (input) {
+        input.value = "";
+        applyFilters();
+      }
+    }
+
+    function clearAllFilters() {
+      document.querySelectorAll(".filter-input").forEach(input => {
+        input.value = "";
+      });
+      applyFilters();
+    }
+
+    function renderActiveFilterChips(filters) {
+      const activeFiltersContainer = document.getElementById("active-filters");
+      if (!activeFiltersContainer) return;
+
+      activeFiltersContainer.innerHTML = "";
+
+      const fieldLabels = {
+        model: "Model",
+        exterior: "Exterior",
+        interior: "Interior",
+        year: "Year",
+        vin: "VIN",
+        packages: "Packages",
+        msrp: "MSRP",
+        dealer: "Dealer"
+      };
+
+      const filterKeys = Object.keys(filters);
+      if (!filterKeys.length) return;
+
+      filterKeys.forEach(field => {
+        const chip = document.createElement("div");
+        chip.className = "filter-chip";
+        chip.innerHTML = `
+          ${fieldLabels[field] || field}: ${escapeHtml(filters[field])}
+          <span class="filter-chip-remove" data-field="${field}">✕</span>
+        `;
+        activeFiltersContainer.appendChild(chip);
+      });
+
+      const clearBtn = document.createElement("button");
+      clearBtn.className = "clear-filters-btn";
+      clearBtn.type = "button";
+      clearBtn.textContent = "Clear All";
+      clearBtn.onclick = clearAllFilters;
+      activeFiltersContainer.appendChild(clearBtn);
+
+      activeFiltersContainer.querySelectorAll(".filter-chip-remove").forEach(btn => {
+        btn.addEventListener("click", () => removeFilter(btn.dataset.field));
+      });
+    }
+
+    function matchesFilter(text, rawFilter) {
+      const cellText = normalize(text);
+      const parts = String(rawFilter || "")
+        .split(",")
+        .map(part => part.trim())
+        .filter(Boolean);
+
+      for (const part of parts) {
+        if (/^-\s*/.test(part)) {
+          const excludeTerm = normalize(part.replace(/^-\s*/, ""));
+          if (excludeTerm && cellText.includes(excludeTerm)) {
+            return false;
+          }
+        } else {
+          const includeTerm = normalize(part);
+          if (includeTerm && !cellText.includes(includeTerm)) {
+            return false;
+          }
+        }
+      }
+
+      return true;
+    }
+
+    function getVehicleFieldText(vehicle, field) {
+      switch (field) {
+        case "model": return vehicle.model;
+        case "exterior": return vehicle.exteriorName + " " + vehicle.exteriorCode;
+        case "interior": return vehicle.interiorName + " " + vehicle.interiorCode;
+        case "year": return vehicle.year;
+        case "vin": return vehicle.vin;
+        case "packages": return vehicle.packageText + " " + vehicle.packageCodes.join(" ");
+        case "msrp": return vehicle.msrp;
+        case "dealer": return vehicle.dealer;
+        default: return "";
+      }
+    }
+
+    function applyFilters() {
+      const filters = getActiveFilters();
+      const sidebarYearFilter = document.getElementById("sidebar-year-filter");
+      if (sidebarYearFilter) {
+        sidebarYearFilter.value = filters.year || "";
+      }
+
+      renderActiveFilterChips(filters);
+
+      filteredVehicles = vehicles.filter(vehicle => {
+        for (const field in filters) {
+          const value = getVehicleFieldText(vehicle, field);
+          if (!matchesFilter(value, filters[field])) {
+            return false;
+          }
+        }
+        return true;
+      });
+
+      renderTable(filteredVehicles);
+      document.getElementById("count").textContent = filteredVehicles.length;
+      updateCharts();
+    }
+
+    function updateCharts() {
+      const exteriorCounts = {};
+      const transmissionCounts = {
+        "Automatic (2MK)": 0,
+        "6-Speed Manual": 0
+      };
+
+      filteredVehicles.forEach(vehicle => {
+        const exterior = vehicle.exteriorName || "Unknown";
+        exteriorCounts[exterior] = (exteriorCounts[exterior] || 0) + 1;
+
+        if (vehicle.packageCodes.includes("2MK")) {
+          transmissionCounts["Automatic (2MK)"]++;
+        } else {
+          transmissionCounts["6-Speed Manual"]++;
+        }
+      });
+
+      const exteriorLabels = Object.keys(exteriorCounts);
+      const exteriorData = Object.values(exteriorCounts);
+
+      const transmissionLabels = Object.keys(transmissionCounts);
+      const transmissionData = Object.values(transmissionCounts);
+
+      const exteriorCanvas = document.getElementById("exteriorPieChart");
+      const transmissionCanvas = document.getElementById("transmissionPieChart");
+
+      if (exteriorPieChart) exteriorPieChart.destroy();
+      if (transmissionPieChart) transmissionPieChart.destroy();
+
+      exteriorPieChart = new Chart(exteriorCanvas, {
+        type: "pie",
+        data: {
+          labels: exteriorLabels.length ? exteriorLabels : ["No Results"],
+          datasets: [{
+            data: exteriorData.length ? exteriorData : [1]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom"
             }
           }
         }
-      } catch (err) {
-        console.error(`Error loading reference data from ${currentCsvFile}:`, err);
-      }
+      });
 
-      if (Object.keys(colorLookup).length === 0) Object.assign(colorLookup, defaultColors);
-      if (Object.keys(interiorLookup).length === 0) Object.assign(interiorLookup, defaultInteriors);
-      Object.assign(packageLookup, defaultPackages, packageLookup);
+      transmissionPieChart = new Chart(transmissionCanvas, {
+        type: "pie",
+        data: {
+          labels: transmissionLabels,
+          datasets: [{
+            data: transmissionData
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "bottom"
+            }
+          }
+        }
+      });
+    }
+
+    function setupFilterInputs() {
+      const debouncedApply = debounce(applyFilters, 120);
+      document.querySelectorAll(".filter-input").forEach(input => {
+        input.addEventListener("input", debouncedApply);
+      });
     }
 
     async function loadCSV() {
-      currentCsvFile = getCsvFileFromUrl();
-      syncDatasetDropdown();
-      await loadReferenceData();
-
       try {
-        const response = await fetch(currentCsvFile);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        currentCsvFile = getCsvFileFromUrl();
+        syncDatasetDropdown();
 
-        const csvText = await response.text();
-        const lines = csvText.trim().split(/\r?\n/);
-        if (!lines.length) throw new Error("CSV file is empty");
-
-        const vehicles = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          if (!lines[i].trim()) continue;
-
-          const cols = parseCSVLine(lines[i]);
-          const vin = cols[4] ? cols[4].trim() : "";
-
-          if (vin && /^WBS/i.test(vin)) {
-            const basePackages = (cols[7] || "").trim();
-            const transmission2MK = (cols[12] || "").trim();
-
-            const combinedPackages = [basePackages];
-            if (transmission2MK.toUpperCase() === "2MK") {
-              combinedPackages.push("2MK");
-            }
-
-            vehicles.push({
-              exterior: cols[0] || "",
-              interior: cols[2] || "",
-              year: cols[1] || "",
-              vin: cols[4] || "",
-              model: "F87",
-              packages: combinedPackages.filter(Boolean).join(", "),
-              msrp: cols[8] || "",
-              dealer: cols[13] || "",
-              details: "",
-              vspec: "",
-              sticker: "",
-              invoice: "",
-            });
-          }
+        const response = await fetch(encodeURI(currentCsvFile));
+        if (!response.ok) {
+          throw new Error(`Could not load ${currentCsvFile}`);
         }
 
-        document.getElementById("count").textContent = vehicles.length;
+        const text = await response.text();
+        const rows = parseCSV(text);
+
+        vehicles = rows.map(buildVehicle);
+        filteredVehicles = [...vehicles];
+
         document.getElementById("total-count").textContent = vehicles.length;
+        document.getElementById("count").textContent = vehicles.length;
 
-        const table = document.getElementById("table-rows");
-        table.innerHTML = "";
-
-        vehicles.forEach((vehicle, index) => {
-          const row = document.createElement("div");
-          row.className = "table-row";
-
-          const paintCode = extractPaintCode(vehicle.exterior);
-          const interiorCode = extractInteriorCode(vehicle.interior);
-
-          const colorData = colorLookup[paintCode] || { rgb: "128,128,128", name: "Unknown" };
-          const interiorData = interiorLookup[interiorCode] || { image: "", description: "Unknown" };
-          const exteriorImage = colorData.image || "";
-          const modelCode = "F87";
-
-          const packageSet = new Set();
-
-          if (vehicle.packages) {
-            vehicle.packages
-              .split(",")
-              .map((p) => p.trim())
-              .filter((p) => p.length > 0)
-              .forEach((p) => packageSet.add(p.toUpperCase()));
-          }
-
-          const packageCodes = Array.from(packageSet);
-          const packageDisplay = packageCodes.length > 0 ? packageCodes.join(", ") : "-";
-
-          const packageDetails = packageCodes
-            .map((code) => {
-              const codeUpper = code.trim().toUpperCase();
-              if (codeUpper === "2MK") {
-                return `<div><strong>2MK:</strong> M Double-clutch Transmission</div>`;
-              }
-              const pkg = packageLookup[codeUpper];
-              return pkg
-                ? `<div><strong>${codeUpper}:</strong> ${pkg}</div>`
-                : `<div><strong>${codeUpper}</strong> (not found in lookup)</div>`;
-            })
-            .join("");
-
-          row.innerHTML = `
-            <div class="cell cell-checkbox"><input type="checkbox"></div>
-            <div class="cell cell-status"><div class="status-circle">G</div></div>
-            <div class="cell cell-image">
-              ${exteriorImage ? `<img src="${exteriorImage}" class="exterior-thumbnail" alt="${vehicle.exterior}">` : `<div class="exterior-thumbnail"></div>`}
-            </div>
-            <div class="cell cell-model"><span class="model-code">${modelCode}</span></div>
-            <div class="cell cell-exterior">
-              <div class="tooltip">
-                <div class="color-display">
-                  <span class="color-circle" style="background-color: rgb(${colorData.rgb})"></span>
-                  <span>${vehicle.exterior}</span>
-                </div>
-                <div class="tooltiptext tooltip-red-content">${vehicle.exterior}<br>RGB: ${colorData.rgb}</div>
-              </div>
-            </div>
-            <div class="cell cell-interior">
-              <div class="tooltip">
-                <div class="interior-display">
-                  ${
-                    interiorData.image
-                      ? `<span class="interior-square" style="background-image: url('${interiorData.image}')"></span>`
-                      : `<span class="interior-square" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></span>`
-                  }
-                  <span>${vehicle.interior}</span>
-                </div>
-                <div class="tooltiptext tooltip-red-content">${vehicle.interior}</div>
-              </div>
-            </div>
-            <div class="cell cell-year">${vehicle.year}</div>
-            <div class="cell cell-vin">
-              <div class="tooltip">
-                <span class="vin-text" id="vin-${index}">${vehicle.vin}</span>
-                <div class="tooltiptext tooltip-red-content">${vehicle.vin}</div>
-              </div>
-              <button class="copy-btn" data-copy-target="vin-${index}" title="Copy VIN">⧉</button>
-            </div>
-            <div class="cell cell-packages">
-              <div class="tooltip">
-                <span class="packages-short">${packageDisplay}</span>
-                ${
-                  packageDetails
-                    ? `<div class="tooltiptext tooltip-packages"><strong>Package Details:</strong><br>${packageDetails}</div>`
-                    : ""
-                }
-              </div>
-            </div>
-            <div class="cell cell-msrp">${vehicle.msrp || "-"}</div>
-            <div class="cell cell-dealer">
-              <div class="tooltip">
-                <span>${vehicle.dealer || "-"}</span>
-                ${vehicle.dealer ? `<div class="tooltiptext tooltip-red-content">${vehicle.dealer}</div>` : ""}
-              </div>
-            </div>
-          `;
-
-          table.appendChild(row);
-
-          const checkbox = row.querySelector('input[type="checkbox"]');
-          checkbox.addEventListener("change", function () {
-            handleCheckboxChange(this, vehicle);
-          });
-        });
-
-        initCopyButtons();
-        applyFilters();
+        renderTable(vehicles);
+        updateCharts();
       } catch (err) {
         console.error("Error loading CSV:", err);
         document.getElementById("table-rows").innerHTML = `
           <div style="padding: 40px; text-align: center; color: #dc3545;">
             <h3>⚠️ Error Loading Data</h3>
-            <p>${err.message}</p>
+            <p>${escapeHtml(err.message)}</p>
             <p>Please ensure the selected CSV file is in the same directory as this HTML file.</p>
           </div>
         `;
       }
     }
-
-    let selectedVehicles = new Set();
 
     function updateSelectionCount() {
       const count = selectedVehicles.size;
@@ -1507,62 +1623,17 @@ document.addEventListener("click", function (e) {
 
       waitForAuthThenLoad();
     });
-  </script>
 
-  <script>
     (() => {
       const favicon = document.getElementById("favicon");
       if (!favicon) return;
+      const originalHref = favicon.href;
+      let flip = false;
 
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src =
-        "https://raw.githubusercontent.com/Sman19/Functioning-Website/ac241a80e9369136c2629f014a56dfff7f28fa03/carbo-insta_1080x1080%20Favicon.png";
-
-      const size = 64;
-      const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext("2d");
-
-      let angle = 0;
-
-      img.onload = () => {
-        setInterval(() => {
-          ctx.clearRect(0, 0, size, size);
-
-          ctx.beginPath();
-          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-          ctx.fillStyle = "#000000";
-          ctx.fill();
-
-          ctx.drawImage(img, 0, 0, size, size);
-
-          ctx.save();
-          ctx.translate(size / 2, size / 2);
-          ctx.rotate(angle);
-
-          const gradient = ctx.createConicGradient(0, 0, 0);
-          gradient.addColorStop(0.0, "#ff0000");
-          gradient.addColorStop(0.16, "#ff9900");
-          gradient.addColorStop(0.33, "#ffff00");
-          gradient.addColorStop(0.5, "#00ff00");
-          gradient.addColorStop(0.66, "#00ffff");
-          gradient.addColorStop(0.83, "#0066ff");
-          gradient.addColorStop(1.0, "#ff00ff");
-
-          ctx.beginPath();
-          ctx.arc(0, 0, 26, 0, Math.PI * 2);
-          ctx.lineWidth = 4;
-          ctx.strokeStyle = gradient;
-          ctx.stroke();
-
-          ctx.restore();
-
-          favicon.href = canvas.toDataURL("image/png");
-          angle += 0.08;
-        }, 120);
-      };
+      setInterval(() => {
+        favicon.href = flip ? originalHref : originalHref;
+        flip = !flip;
+      }, 1500);
     })();
   </script>
 </body>
