@@ -1589,12 +1589,24 @@
         const text = await response.text();
         const rows = parseCSV(text);
 
-        vehicles = rows
-          .map(buildVehicle)
-          .filter(vehicle => {
-            const vin = String(vehicle.vin || "").trim();
-            return vin !== "" && vin !== "-" && vin.length >= 11;
-          });
+        vehicles = [];
+        let reachedEnd = false;
+        
+        rows.forEach(row => {
+          const vehicle = buildVehicle(row);
+          const vin = String(vehicle.vin || "").trim();
+        
+          if (vin === "END_VEHICLES") {
+            reachedEnd = true;
+            return;
+          }
+        
+          if (reachedEnd) return;
+        
+          if (vin !== "" && vin !== "-" && vin.length >= 11) {
+            vehicles.push(vehicle);
+          }
+        });
 
         filteredVehicles = [...vehicles];
 
