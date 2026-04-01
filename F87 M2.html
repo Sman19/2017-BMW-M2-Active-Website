@@ -1394,10 +1394,6 @@
 
     function applyFilters() {
       const filters = getActiveFilters();
-      const sidebarYearFilter = document.getElementById("sidebar-year-filter");
-      if (sidebarYearFilter) {
-        sidebarYearFilter.value = filters.year || "";
-      }
 
       renderActiveFilterChips(filters);
 
