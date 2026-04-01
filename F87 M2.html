@@ -15,6 +15,7 @@
 
   <script type="text/javascript" src="https://www.authpro.com/auth/sman201/?action=pp"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -246,7 +247,7 @@
     .sidebar-chart-wrap {
       position: relative;
       width: 100%;
-      height: 220px;
+      height: 290px;
     }
 
     .main-content {
@@ -352,26 +353,26 @@
     .header-status { width: 40px; }
     .header-checkbox { width: 40px; }
     .header-image { width: 100px; }
-    .header-model { width: 60px; }
-    .header-exterior { width: 220px; }
-    .header-interior { width: 220px; }
-    .header-year { width: 70px; }
-    .header-vin { width: 200px; }
-    .header-packages { width: 400px; }
-    .header-msrp { width: 120px; }
-    .header-dealer { width: 240px; }
+    .header-model { width: 80px; }
+    .header-exterior { width: 280px; }
+    .header-interior { width: 280px; }
+    .header-year { width: 80px; }
+    .header-vin { width: 230px; }
+    .header-packages { width: 420px; }
+    .header-msrp { width: 130px; }
+    .header-dealer { width: 260px; }
 
     .cell-status { width: 40px; }
     .cell-checkbox { width: 40px; }
     .cell-image { width: 100px; }
-    .cell-model { width: 60px; }
-    .cell-exterior { width: 220px; }
-    .cell-interior { width: 220px; }
-    .cell-year { width: 70px; }
-    .cell-vin { width: 200px; }
-    .cell-packages { width: 400px; }
-    .cell-msrp { width: 120px; }
-    .cell-dealer { width: 240px; }
+    .cell-model { width: 80px; }
+    .cell-exterior { width: 280px; }
+    .cell-interior { width: 280px; }
+    .cell-year { width: 80px; }
+    .cell-vin { width: 230px; }
+    .cell-packages { width: 420px; }
+    .cell-msrp { width: 130px; }
+    .cell-dealer { width: 260px; }
 
     .side-panel {
       position: fixed;
@@ -592,6 +593,7 @@
       background-position: center;
       border: 1px solid #999;
       flex-shrink: 0;
+      background-color: #d1d5db;
     }
 
     .cell-vin {
@@ -614,7 +616,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 360px;
+      max-width: 390px;
       display: block;
     }
 
@@ -908,21 +910,21 @@
     let transmissionPieChart = null;
 
     const defaultColors = {
-      "300": { rgb: "255, 255, 255", name: "Alpine White", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Alpine_White_380x260.png?raw=true" },
-      "475": { rgb: "0, 0, 0", name: "Black Sapphire Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Black_Sapphire_380x260.png?raw=true" },
-      "C16": { rgb: "3,137,197", name: "Long Beach Blue", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Long_Beach_Blue_380x260.png?raw=true" },
-      "B39": { rgb: "105,116,137", name: "Mineral Gray Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/c3be7f7ddc554a924c667c73698c21a2c7a04a75/2017_M2_Mineral_Grey_380x260.png?raw=true" },
-      "B67": { rgb: "234,217,86", name: "Austin Yellow Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/c3be7f7ddc554a924c667c73698c21a2c7a04a75/Austin%20Yellow%20Metallic_380x260.png?raw=true" }
+      "300": { rgb: "255, 255, 255", name: "300 - Alpine White III", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Alpine_White_380x260.png?raw=true" },
+      "475": { rgb: "0, 0, 0", name: "475 - Black Sapphire Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Black_Sapphire_380x260.png?raw=true" },
+      "C16": { rgb: "3,137,197", name: "C16 - Long Beach Blue Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/62fa3456fbd19b97c9772c0307a30f3c656ae3c9/2017_M2_Long_Beach_Blue_380x260.png?raw=true" },
+      "B39": { rgb: "105,116,137", name: "B39 - Mineral Grey Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/c3be7f7ddc554a924c667c73698c21a2c7a04a75/2017_M2_Mineral_Grey_380x260.png?raw=true" },
+      "B67": { rgb: "234,217,86", name: "B67 - Austin Yellow Metallic", image: "https://github.com/Sman19/F87-M2-Ext-Int/blob/c3be7f7ddc554a924c667c73698c21a2c7a04a75/Austin%20Yellow%20Metallic_380x260.png?raw=true" }
     };
 
     const defaultInteriors = {
       "LCNL": {
         image: "https://raw.githubusercontent.com/Sman19/F87-M2-Ext-Int/07ab816750f6763c0491ee47bf25568a7bb2a11f/m2%20interior%20Blue%20Stit.png",
-        description: "Black Dakota Leather w. Blue Stitch"
+        description: "LCNL - Black Vernasca Leather w. Blue Stitch"
       },
       "Z1XX": {
         image: "https://raw.githubusercontent.com/Sman19/F87-M2-Ext-Int/c3be7f7ddc554a924c667c73698c21a2c7a04a75/Austin%20yellow%20stitch.png",
-        description: "Black Dakota Leather w. Yellow Stitch"
+        description: "Z1XX - Black Dakota Leather w. Yellow Stitch"
       }
     };
 
@@ -1076,14 +1078,46 @@
       return "";
     }
 
+    function extractCode(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      return raw.split(" - ")[0].trim();
+    }
+
+    function cleanLabel(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "-";
+      return raw;
+    }
+
     function getColorData(codeOrName) {
-      const raw = (codeOrName || "").trim();
-      return defaultColors[raw] || Object.values(defaultColors).find(c => normalize(c.name) === normalize(raw)) || null;
+      const raw = String(codeOrName || "").trim();
+      const code = extractCode(raw);
+
+      if (defaultColors[code]) return defaultColors[code];
+
+      const byName = Object.values(defaultColors).find(c => normalize(c.name) === normalize(raw));
+      if (byName) return byName;
+
+      const byCombinedName = Object.values(defaultColors).find(c => normalize(raw).includes(normalize(c.name)));
+      if (byCombinedName) return byCombinedName;
+
+      return null;
     }
 
     function getInteriorData(codeOrName) {
-      const raw = (codeOrName || "").trim();
-      return defaultInteriors[raw] || null;
+      const raw = String(codeOrName || "").trim();
+      const code = extractCode(raw);
+
+      if (defaultInteriors[code]) return defaultInteriors[code];
+
+      const byDescription = Object.values(defaultInteriors).find(i => normalize(i.description) === normalize(raw));
+      if (byDescription) return byDescription;
+
+      const byCombinedDescription = Object.values(defaultInteriors).find(i => normalize(raw).includes(normalize(i.description)));
+      if (byCombinedDescription) return byCombinedDescription;
+
+      return null;
     }
 
     function getPackageDetail(code) {
@@ -1098,8 +1132,8 @@
     }
 
     function buildVehicle(row) {
-      const exteriorCode = getField(row, ["EXTERIOR", "Exterior", "Color", "Paint Code", "PAINT"]);
-      const interiorCode = getField(row, ["INTERIOR", "Interior", "Trim", "Upholstery"]);
+      const exteriorRaw = getField(row, ["EXTERIOR", "Exterior", "Color", "Paint Code", "PAINT"]);
+      const interiorRaw = getField(row, ["INTERIOR", "Interior", "Trim", "Upholstery"]);
       const year = getField(row, ["YEAR", "Year", "Model Year", "MY"]);
       const vin = getField(row, ["VIN", "Vin", "Full VIN", "Full VIN Number"]);
       const msrp = getField(row, ["MSRP", "Price", "Retail"]);
@@ -1114,17 +1148,17 @@
       const packageCodes = parsePackageCodes(packageCodesRaw);
       const packageDetails = packageCodes.map(code => getPackageDetail(code));
 
-      const exteriorData = getColorData(exteriorCode);
-      const interiorData = getInteriorData(interiorCode);
+      const exteriorData = getColorData(exteriorRaw);
+      const interiorData = getInteriorData(interiorRaw);
 
       return {
         model,
-        exteriorCode,
-        exteriorName: exteriorData ? exteriorData.name : (exteriorCode || "-"),
+        exteriorCode: extractCode(exteriorRaw),
+        exteriorName: cleanLabel(exteriorRaw || (exteriorData ? exteriorData.name : "-")),
         exteriorImage: exteriorData ? exteriorData.image : "",
         exteriorRgb: exteriorData ? exteriorData.rgb : "220,220,220",
-        interiorCode,
-        interiorName: interiorData ? interiorData.description : (interiorCode || "-"),
+        interiorCode: extractCode(interiorRaw),
+        interiorName: cleanLabel(interiorRaw || (interiorData ? interiorData.description : "-")),
         interiorImage: interiorData ? interiorData.image : "",
         year,
         vin,
@@ -1196,7 +1230,7 @@
               ${
                 vehicle.interiorImage
                   ? `<span class="interior-square" style="background-image:url('${escapeHtml(vehicle.interiorImage)}');"></span>`
-                  : `<span class="interior-square" style="background:#d1d5db;"></span>`
+                  : `<span class="interior-square"></span>`
               }
               <span>${escapeHtml(vehicle.interiorName)}</span>
             </div>
@@ -1442,9 +1476,21 @@
           plugins: {
             legend: {
               position: "bottom"
+            },
+            datalabels: {
+              color: "#ffffff",
+              font: {
+                weight: "700",
+                size: 10
+              },
+              formatter: function(value, context) {
+                const label = context.chart.data.labels[context.dataIndex];
+                return value > 0 ? label : "";
+              }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
 
       transmissionPieChart = new Chart(transmissionCanvas, {
@@ -1461,9 +1507,21 @@
           plugins: {
             legend: {
               position: "bottom"
+            },
+            datalabels: {
+              color: "#ffffff",
+              font: {
+                weight: "700",
+                size: 10
+              },
+              formatter: function(value, context) {
+                const label = context.chart.data.labels[context.dataIndex];
+                return value > 0 ? label : "";
+              }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
       });
     }
 
