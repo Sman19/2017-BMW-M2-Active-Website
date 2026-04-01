@@ -624,9 +624,15 @@
       border: 1px solid #d1d5db;
       background: #f9fafb;
       border-radius: 4px;
-      font-size: 11px;
-      padding: 2px 5px;
+      font-size: 13px;
+      line-height: 1;
+      padding: 7px 9px;
       cursor: pointer;
+      min-width: 36px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .copy-btn:hover { background: #e5e7eb; }
@@ -748,10 +754,10 @@
     <div class="page-layout">
       <aside class="left-sidebar" id="left-sidebar">
         <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="Hide filters">◀</button>
-      
+
         <div class="sidebar-content">
           <div class="sidebar-title">Filter Inventory</div>
-      
+
           <div class="sidebar-section">
             <label class="sidebar-label" for="dataset-select">Dataset</label>
             <select id="dataset-select" class="sidebar-select" onchange="handleDatasetChange(this.value)">
@@ -759,7 +765,7 @@
               <option value="2017 F87 M2.csv">2017 M2</option>
             </select>
           </div>
-      
+
           <div class="sidebar-section">
             <label class="sidebar-label">Exterior Breakdown</label>
             <div class="sidebar-chart-card">
@@ -768,7 +774,7 @@
               </div>
             </div>
           </div>
-      
+
           <div class="sidebar-section">
             <label class="sidebar-label">Transmission Breakdown</label>
             <div class="sidebar-chart-card">
@@ -779,7 +785,7 @@
           </div>
         </div>
       </aside>
-      
+
       <div class="main-content">
         <div class="summary-row">
           <div class="summary-left">
@@ -1115,6 +1121,12 @@
         .filter(Boolean);
     }
 
+    function getExteriorChartColor(code) {
+      const colorData = defaultColors[code];
+      if (!colorData || !colorData.rgb) return "rgb(180,180,180)";
+      return `rgb(${colorData.rgb})`;
+    }
+
     function buildVehicle(row) {
       const exteriorRaw = getField(row, ["EXTERIOR", "Exterior", "Color", "Paint Code", "PAINT"]);
       const interiorRaw = getField(row, ["INTERIOR", "Interior", "Trim", "Upholstery"]);
@@ -1172,7 +1184,7 @@
 
       table.innerHTML = "";
 
-      data.forEach(vehicle => {
+      data.forEach((vehicle, index) => {
         const row = document.createElement("div");
         row.className = "table-row";
         row.dataset.vin = vehicle.vin || "";
@@ -1203,30 +1215,39 @@
           </div>
 
           <div class="cell cell-exterior">
-            <div class="color-display">
-              <span class="color-circle" style="background: rgb(${escapeHtml(vehicle.exteriorRgb)});"></span>
-              <span>${escapeHtml(vehicle.exteriorName)}</span>
+            <div class="tooltip">
+              <div class="color-display">
+                <span class="color-circle" style="background-color: rgb(${escapeHtml(vehicle.exteriorRgb)});"></span>
+                <span>${escapeHtml(vehicle.exteriorName)}</span>
+              </div>
+              <div class="tooltiptext tooltip-red-content">${escapeHtml(vehicle.exteriorName)}</div>
             </div>
           </div>
 
           <div class="cell cell-interior">
-            <div class="interior-display">
-              ${
-                vehicle.interiorImage
-                  ? `<span class="interior-square" style="background-image:url('${escapeHtml(vehicle.interiorImage)}');"></span>`
-                  : `<span class="interior-square"></span>`
-              }
-              <span>${escapeHtml(vehicle.interiorName)}</span>
+            <div class="tooltip">
+              <div class="interior-display">
+                ${
+                  vehicle.interiorImage
+                    ? `<span class="interior-square" style="background-image: url('${escapeHtml(vehicle.interiorImage)}')"></span>`
+                    : `<span class="interior-square"></span>`
+                }
+                <span>${escapeHtml(vehicle.interiorName)}</span>
+              </div>
+              <div class="tooltiptext tooltip-red-content">${escapeHtml(vehicle.interiorName)}</div>
             </div>
           </div>
 
           <div class="cell cell-year">${escapeHtml(vehicle.year || "-")}</div>
 
           <div class="cell cell-vin">
-            <span class="vin-text">${escapeHtml(vehicle.vin || "-")}</span>
+            <div class="tooltip">
+              <span class="vin-text" id="vin-${index}">${escapeHtml(vehicle.vin || "-")}</span>
+              <div class="tooltiptext tooltip-red-content">${escapeHtml(vehicle.vin || "-")}</div>
+            </div>
             ${
               vehicle.vin
-                ? `<button class="copy-btn" type="button" data-copy="${escapeHtml(vehicle.vin)}">Copy</button>`
+                ? `<button class="copy-btn" data-copy-target="vin-${index}" title="Copy VIN">⧉</button>`
                 : ""
             }
           </div>
@@ -1247,39 +1268,41 @@
           <div class="cell cell-dealer">
             <div class="tooltip">
               <span>${escapeHtml(vehicle.dealer || "-")}</span>
-              ${
-                vehicle.dealer
-                  ? `<div class="tooltiptext tooltip-red-content">${escapeHtml(vehicle.dealer)}</div>`
-                  : ""
-              }
+              ${vehicle.dealer ? `<div class="tooltiptext tooltip-red-content">${escapeHtml(vehicle.dealer)}</div>` : ""}
             </div>
           </div>
         `;
+
+        table.appendChild(row);
 
         const checkbox = row.querySelector('input[type="checkbox"]');
         checkbox.addEventListener("change", function () {
           handleCheckboxChange(this, vehicle);
         });
-
-        table.appendChild(row);
       });
 
       initCopyButtons();
     }
 
     function initCopyButtons() {
-      document.querySelectorAll(".copy-btn").forEach(btn => {
+      document.querySelectorAll(".copy-btn").forEach((btn) => {
         btn.addEventListener("click", async function () {
-          const value = this.dataset.copy || "";
+          const targetId = this.dataset.copyTarget;
+          const target = document.getElementById(targetId);
+          const value = target ? target.textContent.trim() : "";
+
+          if (!value) return;
+
           try {
             await navigator.clipboard.writeText(value);
             const original = this.textContent;
-            this.textContent = "Copied";
+            this.textContent = "✓";
             this.classList.add("copied");
+
             setTimeout(() => {
               this.textContent = original;
               this.classList.remove("copied");
-            }, 1200);
+            }, 1000);
           } catch (err) {
             console.error("Copy failed:", err);
           }
@@ -1394,7 +1417,6 @@
 
     function applyFilters() {
       const filters = getActiveFilters();
-
       renderActiveFilterChips(filters);
 
       filteredVehicles = vehicles.filter(vehicle => {
@@ -1420,8 +1442,8 @@
       };
 
       filteredVehicles.forEach(vehicle => {
-        const exterior = vehicle.exteriorName || "Unknown";
-        exteriorCounts[exterior] = (exteriorCounts[exterior] || 0) + 1;
+        const exteriorCode = vehicle.exteriorCode || "Unknown";
+        exteriorCounts[exteriorCode] = (exteriorCounts[exteriorCode] || 0) + 1;
 
         if (vehicle.packageCodes.includes("2MK")) {
           transmissionCounts["Automatic (2MK)"]++;
@@ -1447,7 +1469,12 @@
         data: {
           labels: exteriorLabels.length ? exteriorLabels : ["No Results"],
           datasets: [{
-            data: exteriorData.length ? exteriorData : [1]
+            data: exteriorData.length ? exteriorData : [1],
+            backgroundColor: exteriorLabels.length
+              ? exteriorLabels.map(code => getExteriorChartColor(code))
+              : ["rgb(180,180,180)"],
+            borderColor: "#ffffff",
+            borderWidth: 2
           }]
         },
         options: {
@@ -1455,13 +1482,37 @@
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: "bottom"
+              position: "bottom",
+              labels: {
+                boxWidth: 16,
+                boxHeight: 16,
+                padding: 12,
+                generateLabels(chart) {
+                  const labels = chart.data.labels || [];
+                  const dataset = chart.data.datasets[0];
+                  const total = (dataset.data || []).reduce((sum, value) => sum + value, 0);
+
+                  return labels.map((label, i) => {
+                    const value = dataset.data[i] || 0;
+                    const percent = total ? ((value / total) * 100).toFixed(1) : "0.0";
+
+                    return {
+                      text: `${percent}%  ${label}`,
+                      fillStyle: dataset.backgroundColor[i],
+                      strokeStyle: dataset.backgroundColor[i],
+                      lineWidth: 1,
+                      hidden: !chart.getDataVisibility(i),
+                      index: i
+                    };
+                  });
+                }
+              }
             },
             datalabels: {
               color: "#ffffff",
               font: {
                 weight: "700",
-                size: 10
+                size: 11
               },
               formatter: function(value, context) {
                 const label = context.chart.data.labels[context.dataIndex];
