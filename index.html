@@ -1080,10 +1080,31 @@
             }
 
             const text = await response.text();
-            return parseCSV(text, file);
+            const parsedRows = parseCSV(text, file);
+
+            const filteredRows = [];
+            let reachedEnd = false;
+
+            parsedRows.forEach(row => {
+              const vin = String(getBestVin(row) || "").trim();
+
+              if (vin === "END_VEHICLES") {
+                reachedEnd = true;
+                return;
+              }
+
+              if (reachedEnd) return;
+
+              if (vin !== "" && vin !== "-" && vin.length >= 11) {
+                filteredRows.push(row);
+              }
+            });
+
+            return filteredRows;
           })
         );
 
+        allRows.length = 0;
         responses.flat().forEach(row => allRows.push(row));
 
         loadingStatus.classList.add("hidden");
