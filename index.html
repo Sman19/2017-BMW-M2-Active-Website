@@ -414,6 +414,65 @@
       text-decoration: underline;
     }
 
+    .play-audio-btn {
+      width: 92px;
+      height: 92px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      padding: 0;
+    }
+
+    .play-audio-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        #ff003c,
+        #ff8a00,
+        #ffd400,
+        #48ff00,
+        #00ffd5,
+        #0066ff,
+        #7a00ff,
+        #ff00c8,
+        #ff003c
+      );
+      animation: rainbowSpin 3s linear infinite;
+      box-shadow: 0 0 18px rgba(31,115,255,0.22);
+    }
+
+    .play-audio-btn::after {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    .play-audio-label {
+      position: relative;
+      z-index: 2;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1f73ff;
+      letter-spacing: 0.03em;
+    }
+
+    .play-audio-btn.playing {
+      animation: pulseBeat 0.12s ease-out infinite alternate;
+    }
+
+    .play-audio-btn.playing .play-audio-label {
+      color: #111827;
+    }
+
     .muted {
       color: #777;
     }
@@ -471,6 +530,16 @@
 
     .monroney-modal-btn:hover {
       background: #165fd3;
+    }
+
+    @keyframes rainbowSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseBeat {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
     }
 
     @media (max-width: 1200px) {
@@ -702,7 +771,9 @@
           <a class="open-link" href="F87%20M2.html">Open</a>
         </div>
         <div class="series-cell">
-          <a class="open-link" href="#" onclick="playF87OpenAudio(event)">Exhaust Clip</a>
+          <button class="play-audio-btn" type="button" onclick="playF87OpenAudio(event, this)">
+            <span class="play-audio-label">PLAY ME</span>
+          </button>
         </div>
       </div>
 
@@ -715,7 +786,9 @@
           <a class="open-link" href="E90%20Sedan.html">Open</a>
         </div>
         <div class="series-cell">
-          <a class="open-link" href="#" onclick="playE90OpenAudio(event)">Exhaust Clip</a>
+          <button class="play-audio-btn" type="button" onclick="playE90OpenAudio(event, this)">
+            <span class="play-audio-label">PLAY ME</span>
+          </button>
         </div>
       </div>
     </section>
@@ -770,6 +843,13 @@
     const monroneyOverlay = document.getElementById("monroneyOverlay");
     const monroneyModalText = document.getElementById("monroneyModalText");
     const closeMonroneyModal = document.getElementById("closeMonroneyModal");
+
+    let activeAudioContext = null;
+    let activeSource = null;
+    let activeAnalyser = null;
+    let activeAnimationFrame = null;
+    let activeButton = null;
+    let activeAudio = null;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -1127,26 +1207,105 @@
       }
     }
 
-    function playF87OpenAudio(event) {
-      event.preventDefault();
+    function stopActiveAudioVisual() {
+      if (activeAnimationFrame) {
+        cancelAnimationFrame(activeAnimationFrame);
+        activeAnimationFrame = null;
+      }
 
-      const audio = document.getElementById("f87OpenAudio");
-      if (!audio) return;
+      if (activeButton) {
+        activeButton.classList.remove("playing");
+        activeButton.style.transform = "";
+      }
 
-      audio.pause();
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio.currentTime = 0;
+        activeAudio.onended = null;
+      }
+
+      if (activeSource) {
+        try {
+          activeSource.disconnect();
+        } catch (e) {}
+        activeSource = null;
+      }
+
+      activeAnalyser = null;
+      activeButton = null;
+      activeAudio = null;
     }
 
-    function playE90OpenAudio(event) {
-      event.preventDefault();
+    function attachAudioPulse(audio, button) {
+      stopActiveAudioVisual();
 
-      const audio = document.getElementById("e90OpenAudio");
-      if (!audio) return;
+      activeButton = button;
+      activeAudio = audio;
+
+      if (!activeAudioContext) {
+        activeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (activeAudioContext.state === "suspended") {
+        activeAudioContext.resume();
+      }
+
+      activeSource = activeAudioContext.createMediaElementSource(audio);
+      activeAnalyser = activeAudioContext.createAnalyser();
+
+      activeAnalyser.fftSize = 256;
+      activeSource.connect(activeAnalyser);
+      activeAnalyser.connect(activeAudioContext.destination);
+
+      const dataArray = new Uint8Array(activeAnalyser.frequencyBinCount);
+
+      function animatePulse() {
+        if (!activeAnalyser || !activeButton || !activeAudio || activeAudio.paused) return;
+
+        activeAnalyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+
+        const average = sum / dataArray.length;
+        const scale = 1 + Math.min(average / 512, 0.18);
+
+        activeButton.classList.add("playing");
+        activeButton.style.transform = `scale(${scale})`;
+
+        activeAnimationFrame = requestAnimationFrame(animatePulse);
+      }
+
+      audio.onended = () => {
+        stopActiveAudioVisual();
+      };
 
       audio.pause();
       audio.currentTime = 0;
-      audio.play().catch(() => {});
+
+      audio.play()
+        .then(() => {
+          animatePulse();
+        })
+        .catch(() => {
+          stopActiveAudioVisual();
+        });
+    }
+
+    function playF87OpenAudio(event, button) {
+      event.preventDefault();
+      const audio = document.getElementById("f87OpenAudio");
+      if (!audio || !button) return;
+      attachAudioPulse(audio, button);
+    }
+
+    function playE90OpenAudio(event, button) {
+      event.preventDefault();
+      const audio = document.getElementById("e90OpenAudio");
+      if (!audio || !button) return;
+      attachAudioPulse(audio, button);
     }
 
     searchBtn.addEventListener("click", runSearch);
