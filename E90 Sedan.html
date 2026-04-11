@@ -1258,7 +1258,13 @@
         case "interior": return `${vehicle.interior || ""} ${vehicle.interiorCode || ""} ${vehicle.interiorData.description || ""}`;
         case "year": return vehicle.year || "";
         case "vin": return vehicle.vin || "";
-        case "packages": return `${vehicle.packageCodes.join(" ")} ${vehicle.packageDetails.join(" ")}`;
+        case "packages":
+          return `
+            ${vehicle.packageCodes.join(" ")}
+            ${vehicle.packageDetails.join(" ")}
+            ${vehicle.details || ""}
+            ${vehicle.vspec || ""}
+          `;
         case "msrp": return vehicle.msrp || "";
         case "dealer": return vehicle.dealer || "";
         default: return "";
