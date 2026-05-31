@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>2011 BMW E90 M3 Sedan Configurator - BMW Spec Sheet PDF v11</title>
+<title>2011 BMW E90 M3 Sedan Configurator - Simple BMW Spec Sheet</title>
 
 <style>
 :root {
@@ -693,8 +693,7 @@ textarea {
     <div class="actions-column">
       <div class="actions">
         <button class="btn" id="resetBtn">Reset Build</button>
-        <button class="btn" id="copyBuildBtn">▣ BMW-Spec Sheet PDF</button>
-        <button class="btn sticker-btn" id="windowStickerBtn">🏷 Window Sticker</button>
+        <button class="btn" id="copyBuildBtn">▣ Simple BMW Spec Sheet</button>
         <button class="btn primary" id="copySummaryBtn">View Summary</button>
       </div>
 
@@ -2967,7 +2966,7 @@ function buildWindowStickerHTML() {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>2011 BMW M3 11x17 Spec Sheet</title>
+<title>2011 BMW M3 Simple 11x17 Spec Sheet</title>
 <style>
   @page { size: 17in 11in; margin: 0; }
   * { box-sizing: border-box; }
@@ -3263,7 +3262,7 @@ function buildWindowStickerHTML() {
 </head>
 <body>
   <div class="toolbar">
-    <span>11x17 landscape spec sheet. Use Zoom Out or Fit to Screen for preview only. Printing stays full 11x17.</span>
+    <span>Simple 11x17 landscape BMW spec sheet. Use Zoom Out or Fit to Screen for preview only. Printing stays full 11x17.</span>
     <div class="toolbar-actions">
       <button class="secondary" onclick="zoomPreview(-0.05)">Zoom Out</button>
       <button class="secondary" onclick="fitPreview()">Fit Screen</button>
@@ -3378,7 +3377,7 @@ function buildWindowStickerHTML() {
 function generateWindowSticker() {
   const popup = window.open("", "_blank");
   if (!popup) {
-    alert("Popup blocked. Please allow popups for this site to preview the window sticker.");
+    alert("Popup blocked. Please allow popups for this site to preview the spec sheet.");
     return;
   }
 
@@ -3387,22 +3386,8 @@ function generateWindowSticker() {
   popup.document.close();
 }
 
-if ($("windowStickerBtn")) {
-  $("windowStickerBtn").onclick = generateWindowSticker;
-}
-
-$("copyBuildBtn").onclick = async () => {
-  const btn = $("copyBuildBtn");
-  btn.textContent = "Downloading...";
-  try {
-    await downloadBMWBuildSheetPDF();
-    btn.textContent = "Downloaded";
-  } catch (err) {
-    console.error(err);
-    alert("Build sheet PDF could not be generated. Check the browser console for details.");
-    btn.textContent = "PDF Error";
-  }
-  setTimeout(() => btn.textContent = "▣ Save BMW-Style PDF", 1200);
+$("copyBuildBtn").onclick = () => {
+  generateWindowSticker();
 };
 
 $("copySummaryBtn").onclick = async () => {
